@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 45 100% 96%;
+    --foreground: 25 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 25 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 25% 15%;
+    --primary: 32 95% 44%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 45 100% 95%;
+    --secondary-foreground: 25 25% 15%;
+    --muted: 45 100% 95%;
+    --muted-foreground: 25 25% 45%;
+    --accent: 32 95% 44%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 45 100% 90%;
+    --input: 45 100% 90%;
+    --ring: 32 95% 44%;
+    --chart-1: 32 95% 44%;
+    --chart-2: 45 100% 51%;
+    --chart-3: 25 62% 55%;
+    --chart-4: 15 86% 65%;
+    --chart-5: 35 77% 49%;
+    --radius: 0.75rem;
+    
+    /* Bakery specific colors */
+    --bakery-brown: 25 62% 35%;
+    --bakery-cream: 45 100% 96%;
+    --bakery-gold: 45 100% 51%;
+    --bakery-orange: 25 95% 53%;
+    --bakery-red: 15 86% 65%;
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --info: 221 83% 53%;
+  }
+  
+  .dark {
+    --background: 25 25% 8%;
+    --foreground: 45 100% 96%;
+    --card: 25 25% 8%;
+    --card-foreground: 45 100% 96%;
+    --popover: 25 25% 8%;
+    --popover-foreground: 45 100% 96%;
+    --primary: 32 95% 44%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 25 25% 15%;
+    --secondary-foreground: 45 100% 96%;
+    --muted: 25 25% 15%;
+    --muted-foreground: 45 100% 70%;
+    --accent: 25 25% 15%;
+    --accent-foreground: 45 100% 96%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 25 25% 15%;
+    --input: 25 25% 15%;
+    --ring: 32 95% 44%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .bakery-gradient {
+    @apply bg-gradient-to-br from-orange-100 via-amber-50 to-yellow-100;
+  }
+  
+  .bakery-card {
+    @apply bg-white/80 backdrop-blur-sm border border-orange-200/50 shadow-lg shadow-orange-100/50;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+  
+  .text-bakery-brown {
+    color: hsl(var(--bakery-brown));
+  }
+  
+  .bg-bakery-cream {
+    background-color: hsl(var(--bakery-cream));
+  }
+  
+  .bg-bakery-gold {
+    background-color: hsl(var(--bakery-gold));
+  }
+  
+  .border-bakery-gold {
+    border-color: hsl(var(--bakery-gold));
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
