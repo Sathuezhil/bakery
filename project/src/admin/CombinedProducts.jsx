@@ -389,7 +389,7 @@ useEffect(() => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center">

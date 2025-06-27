@@ -577,8 +577,8 @@ export default function ColomboStaff() {
                               <div className="text-2xl font-bold text-green-600">{formatSalary(selectedStaff.salary)}</div>
                               <p className="text-sm text-muted-foreground">Annual Salary</p>
                             </div>
-                            <div className="text-center p-4 bg-blue-50 rounded-lg">
-                              <div className="text-2xl font-bold text-blue-600">
+                            <div className="text-center p-4 bg-orange-50 rounded-lg">
+                              <div className="text-2xl font-bold text-orange-600">
                                 {Math.floor((new Date() - new Date(selectedStaff.hireDate)) / (1000 * 60 * 60 * 24 * 30))}
                               </div>
                               <p className="text-sm text-muted-foreground">Months Employed</p>

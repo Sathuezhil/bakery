@@ -316,7 +316,7 @@ export default function CombinedOrders() {
                           {getStatusIcon(order.status)}
                           {order.status.replace('-', ' ')}
                         </Badge>
-                        <Badge className={`ml-2 ${order.branch === 'Jaffna' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{order.branch}</Badge>
+                        <Badge className={`ml-2 ${order.branch === 'Jaffna' ? 'bg-orange-100 text-orange-700' : 'bg-orange-100 text-orange-700'}`}>{order.branch}</Badge>
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-bold text-green-600">LKR {order.total.toFixed(2)}</div>
@@ -363,7 +363,7 @@ export default function CombinedOrders() {
                   {getStatusIcon(selectedOrder.status)}
                   {selectedOrder.status.replace('-', ' ')}
                 </Badge>
-                <Badge className={`ml-2 ${selectedOrder.branch === 'Jaffna' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{selectedOrder.branch}</Badge>
+                <Badge className={`ml-2 ${selectedOrder.branch === 'Jaffna' ? 'bg-orange-100 text-orange-700' : 'bg-orange-100 text-orange-700'}`}>{selectedOrder.branch}</Badge>
               </div>
               <Separator />
               <div>

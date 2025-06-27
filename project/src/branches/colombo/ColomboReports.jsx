@@ -77,7 +77,7 @@ export default function ColomboReports() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-blue-700">Reports & Analytics</h1>
+          <h1 className="text-3xl font-bold text-orange-700">Reports & Analytics</h1>
           <p className="text-gray-500">Colombo branch business insights and performance metrics</p>
         </div>
         <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ export default function ColomboReports() {
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Orders</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-orange-600">
                   {currentData.reduce((sum, item) => sum + item.orders, 0)}
                 </p>
                 <div className="flex items-center gap-1 text-sm mt-1">
@@ -137,7 +137,7 @@ export default function ColomboReports() {
                   </span>
                 </div>
               </div>
-              <ShoppingCart className="w-8 h-8 text-blue-500 opacity-30" />
+              <ShoppingCart className="w-8 h-8 text-orange-500 opacity-30" />
             </div>
           </CardContent>
         </Card>
@@ -148,7 +148,7 @@ export default function ColomboReports() {
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-gray-500">Customers</p>
-                <p className="text-2xl font-bold text-blue-700">
+                <p className="text-2xl font-bold text-orange-700">
                   {currentData.reduce((sum, item) => sum + item.customers, 0)}
                 </p>
                 <div className="flex items-center gap-1 text-sm mt-1">
@@ -158,7 +158,7 @@ export default function ColomboReports() {
                   </span>
                 </div>
               </div>
-              <Users className="w-8 h-8 text-blue-700 opacity-30" />
+              <Users className="w-8 h-8 text-orange-700 opacity-30" />
             </div>
           </CardContent>
         </Card>
@@ -169,7 +169,7 @@ export default function ColomboReports() {
         {/* Sales Trend */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-blue-700">Sales Trend</CardTitle>
+            <CardTitle className="text-lg text-orange-700">Sales Trend</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -187,7 +187,7 @@ export default function ColomboReports() {
         {/* Customer Segments */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-blue-700">Customer Segments</CardTitle>
+            <CardTitle className="text-lg text-orange-700">Customer Segments</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

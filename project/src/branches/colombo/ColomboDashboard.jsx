@@ -95,19 +95,19 @@ export default function ColomboDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
               Good Morning, Colombo Manager! <span role="img" aria-label="sun">☀️</span>
             </h1>
-            <p className="text-blue-100 text-lg">Welcome back to SE Bakers - Colombo</p>
+            <p className="text-orange-100 text-lg">Welcome back to SE Bakers - Colombo</p>
             <div className="flex items-center space-x-4 mt-2">
-              <p className="text-blue-200 text-sm">
+              <p className="text-orange-200 text-sm">
                 Store Manager: <span className="font-semibold">Nimal Perera</span>
               </p>
             </div>
-            <p className="text-blue-200 text-sm mt-1">
+            <p className="text-orange-200 text-sm mt-1">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -148,14 +148,14 @@ export default function ColomboDashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Orders Today
             </CardTitle>
-            <ShoppingCart className="w-4 h-4 text-blue-600" />
+            <ShoppingCart className="w-4 h-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-orange-600">
               127
             </div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <TrendingUp className="w-3 h-3 mr-1 text-blue-600" />
+              <TrendingUp className="w-3 h-3 mr-1 text-orange-600" />
               +8% from yesterday
             </p>
           </CardContent>

@@ -74,7 +74,7 @@ export default function CombinedReports() {
 
   const branches = [
     { name: 'Jaffna', color: 'text-orange-700' },
-    { name: 'Colombo', color: 'text-blue-700' }
+    { name: 'Colombo', color: 'text-orange-700' }
   ];
 
   const getData = (branch) => {
@@ -187,7 +187,7 @@ export default function CombinedReports() {
                     <div className="flex justify-between">
                       <div>
                         <p className="text-sm text-gray-500">Total Orders</p>
-                        <p className={`text-2xl font-bold ${b.color === 'text-orange-700' ? 'text-blue-600' : 'text-blue-600'}`}>
+                        <p className={`text-2xl font-bold ${b.color === 'text-orange-700' ? 'text-orange-600' : 'text-orange-600'}`}>
                           {data.reduce((sum, item) => sum + item.orders, 0)}
                         </p>
                         <div className="flex items-center gap-1 text-sm mt-1">
@@ -197,7 +197,7 @@ export default function CombinedReports() {
                           </span>
                         </div>
                       </div>
-                      <ShoppingCart className="w-8 h-8 text-blue-500 opacity-30" />
+                      <ShoppingCart className="w-8 h-8 text-orange-500 opacity-30" />
                     </div>
                   </CardContent>
                 </Card>
@@ -216,7 +216,7 @@ export default function CombinedReports() {
                           </span>
                         </div>
                       </div>
-                      <Users className={`w-8 h-8 ${b.color} opacity-30`} />
+                      <Users className="w-8 h-8 text-orange-400 opacity-30" />
                     </div>
                   </CardContent>
                 </Card>
@@ -234,7 +234,7 @@ export default function CombinedReports() {
                         <XAxis dataKey="period" />
                         <YAxis />
                         <Tooltip />
-                        <Area type="monotone" dataKey="sales" stroke={b.color === 'text-orange-700' ? '#f97316' : '#3b82f6'} fill={b.color === 'text-orange-700' ? '#f97316' : '#3b82f6'} fillOpacity={0.2} />
+                        <Area type="monotone" dataKey="sales" stroke="#f97316" fill="#f97316" fillOpacity={0.2} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </CardContent>

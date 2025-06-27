@@ -117,7 +117,7 @@ export default function CombinedCustomers() {
                       <p className="text-sm text-gray-500">{customer.email}</p>
                     </div>
                   </div>
-                  <Badge className={`text-xs ${customer.status === 'vip' ? 'bg-purple-100 text-purple-800 border-purple-200' : customer.status === 'regular' ? 'bg-blue-100 text-blue-800 border-blue-200' : customer.status === 'new' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                  <Badge className={`text-xs ${customer.status === 'vip' ? 'bg-purple-100 text-purple-800 border-purple-200' : customer.status === 'regular' ? 'bg-orange-100 text-orange-800 border-orange-200' : customer.status === 'new' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-100 text-gray-800 border-gray-200'}`}>
                     <span className="flex items-center space-x-1">
                       {customer.status === 'vip' ? <Star className="w-3 h-3" /> : customer.status === 'regular' ? <Heart className="w-3 h-3" /> : customer.status === 'new' ? <Star className="w-3 h-3" /> : null}
                       <span className="capitalize">{customer.status || customer.branch}</span>

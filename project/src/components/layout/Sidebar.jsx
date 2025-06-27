@@ -76,8 +76,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
                     className={cn(
                       'px-3 py-1 rounded-full font-semibold text-xs flex items-center space-x-1',
                       activeBranch === 'combined'
-                        ? 'bg-purple-500 text-white shadow'
-                        : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                        ? 'bg-orange-500 text-white shadow'
+                        : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
                     )}
                   >
                     <Crown className="w-3 h-3" />
@@ -101,8 +101,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
                     className={cn(
                       'px-3 py-1 rounded-full font-semibold text-xs',
                       activeBranch === 'colombo'
-                        ? 'bg-blue-600 text-white shadow'
-                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        ? 'bg-orange-500 text-white shadow'
+                        : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
                     )}
                   >
                     Colombo
@@ -130,8 +130,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
                 className={cn(
                   'px-4 py-1 rounded-full font-semibold text-sm',
                   activeBranch === 'colombo'
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                    ? 'bg-orange-500 text-white shadow'
+                    : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
                 )}
               >
                 Colombo
@@ -155,9 +155,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
                   className={cn(
                     "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 text-left group",
                     activeTab === item.id
-                      ? userRole === 'super-admin' 
-                        ? "bg-gradient-to-r from-purple-400 to-indigo-500 text-white shadow-lg shadow-purple-200/50"
-                        : "bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-lg shadow-orange-200/50"
+                      ? "bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-lg shadow-orange-200/50"
                       : "text-orange-800 hover:bg-orange-100/70 hover:text-orange-900"
                   )}
                 >

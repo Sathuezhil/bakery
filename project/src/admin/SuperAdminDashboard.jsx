@@ -98,7 +98,7 @@ export default function SuperAdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
@@ -154,14 +154,14 @@ export default function SuperAdminDashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Orders
             </CardTitle>
-            <ShoppingCart className="w-4 h-4 text-blue-600" />
+            <ShoppingCart className="w-4 h-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-orange-600">
               {totalOrders}
             </div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <TrendingUp className="w-3 h-3 mr-1 text-blue-600" />
+              <TrendingUp className="w-3 h-3 mr-1 text-orange-600" />
               Across all branches
             </p>
           </CardContent>

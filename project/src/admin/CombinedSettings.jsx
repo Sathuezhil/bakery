@@ -38,7 +38,7 @@ const defaultSettings = {
 
 const branches = [
   { name: 'Jaffna', color: 'text-orange-700' },
-  { name: 'Colombo', color: 'text-blue-700' }
+  { name: 'Colombo', color: 'text-orange-700' }
 ];
 
 const defaultPromotions = [

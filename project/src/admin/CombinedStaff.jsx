@@ -121,7 +121,7 @@ export default function CombinedStaff() {
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <span>Branch:</span>
-                    <span className={staff.branch === 'Jaffna' ? 'text-orange-600 font-semibold' : 'text-blue-600 font-semibold'}>{staff.branch}</span>
+                    <span className={staff.branch === 'Jaffna' ? 'text-orange-600 font-semibold' : 'text-orange-600 font-semibold'}>{staff.branch}</span>
                   </div>
                 </div>
                 <div className="mt-4 flex space-x-2">
@@ -174,7 +174,7 @@ export default function CombinedStaff() {
                               </div>
                               <div className="flex items-center space-x-2">
                                 <span className="font-semibold">Branch:</span>
-                                <span className={selectedStaff.branch === 'Jaffna' ? 'text-orange-600 font-semibold' : 'text-blue-600 font-semibold'}>{selectedStaff.branch}</span>
+                                <span className={selectedStaff.branch === 'Jaffna' ? 'text-orange-600 font-semibold' : 'text-orange-600 font-semibold'}>{selectedStaff.branch}</span>
                               </div>
                             </div>
                             <div className="space-y-2">
