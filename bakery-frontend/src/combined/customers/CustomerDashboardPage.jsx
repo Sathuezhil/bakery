@@ -5,14 +5,21 @@ const mockOrders = [
   { id: 100, date: '2024-06-05', total: 800, status: 'Pending' },
 ];
 const nextRewardPoints = 200;
-const currentPoints = 150;
-const progress = Math.min((currentPoints / nextRewardPoints) * 100, 100);
 const mockPromos = [
   { id: 1, title: '10% OFF on Cakes', desc: 'All cakes this week!', icon: <Gift className="w-6 h-6" /> },
   { id: 2, title: 'Buy 2 Get 1 Free', desc: 'On all buns and rolls.', icon: <ShoppingBag className="w-6 h-6" /> },
 ];
 
-export default function CustomerDashboardPage({ customer }) {
+export default function CustomerDashboardPage({ customer, activeCustomerBranch }) {
+  // Mock data for demo
+  const branchStats = {
+    jaffna: { totalOrders: 12, loyaltyPoints: 340 },
+    colombo: { totalOrders: 7, loyaltyPoints: 210 },
+  };
+  const isBranchSelected = activeCustomerBranch === 'jaffna' || activeCustomerBranch === 'colombo';
+  const totalOrders = isBranchSelected ? branchStats[activeCustomerBranch].totalOrders : 12;
+  const currentPoints = isBranchSelected ? branchStats[activeCustomerBranch].loyaltyPoints : 150;
+
   return (
     <div className="w-full max-w-4xl mx-auto animate-fade-in">
       {/* Profile Card */}
@@ -51,15 +58,15 @@ export default function CustomerDashboardPage({ customer }) {
           <span className="text-sm text-orange-500">{currentPoints} / {nextRewardPoints} points</span>
         </div>
         <div className="w-full h-4 bg-orange-100 rounded-full overflow-hidden relative">
-          <div className="h-4 bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-700" style={{ width: `${progress}%` }}></div>
-          <Star className="w-5 h-5 text-amber-400 absolute -right-3 -top-2 animate-pulse" style={{ left: `calc(${progress}% - 10px)` }} />
+          <div className="h-4 bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-700" style={{ width: `${Math.min((currentPoints / nextRewardPoints) * 100, 100)}%` }}></div>
+          <Star className="w-5 h-5 text-amber-400 absolute -right-3 -top-2 animate-pulse" style={{ left: `calc(${Math.min((currentPoints / nextRewardPoints) * 100, 100)}% - 10px)` }} />
         </div>
         <div className="text-xs text-orange-600 mt-1">{nextRewardPoints - currentPoints} points to next reward!</div>
       </div>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-gradient-to-br from-orange-400 to-amber-300 rounded-2xl shadow-lg p-6 flex flex-col items-center animate-fade-in-up">
-          <div className="text-4xl font-bold text-white mb-2">12</div>
+          <div className="text-4xl font-bold text-white mb-2">{totalOrders}</div>
           <div className="text-lg font-semibold text-white">Total Orders</div>
         </div>
         <div className="bg-gradient-to-br from-orange-300 to-orange-500 rounded-2xl shadow-lg p-6 flex flex-col items-center animate-fade-in-up">
