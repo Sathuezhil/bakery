@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Menu, Bell, Search, User, LogOut, Crown, Building2, Package, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Badge } from '../../../components/ui/badge';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
-import { Popover, PopoverTrigger, PopoverContent } from '../../../components/ui/popover';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 export default function Header({ setSidebarOpen, user, onLogout }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
