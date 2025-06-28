@@ -79,7 +79,7 @@ function App() {
   // If user is not logged in, show login or signup page
   if (!user && !customerUser) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen space-y-8">
+      <div className="min-h-screen bakery-gradient flex flex-col items-center justify-center space-y-8">
         <LoginPage onLogin={handleUnifiedLogin} onShowSignup={() => setShowSignup(true)} />
         {showSignup && (
           <Signup onShowLogin={() => setShowSignup(false)} />
@@ -91,7 +91,7 @@ function App() {
   // If customer is logged in, show only their dashboard and sidebar
   if (customerUser) {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="min-h-screen bakery-gradient flex h-screen">
         <CustomerSidebar
           activeTab={customerTab}
           setActiveTab={setCustomerTab}
@@ -116,7 +116,7 @@ function App() {
   // If super admin selects 'customer' branch, show customer sidebar and dashboard
   if (user && user.role === 'super-admin' && activeBranch === 'customer') {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="min-h-screen bakery-gradient flex h-screen">
         <CustomerSidebar
           activeTab={customerTab}
           setActiveTab={setCustomerTab}
@@ -191,7 +191,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="min-h-screen bakery-gradient flex h-screen">
       <Sidebar
         activeTab={activeBranchPage}
         setActiveTab={setActiveBranchPage}
@@ -199,16 +199,18 @@ function App() {
         setSidebarOpen={setSidebarOpen}
         activeBranch={activeBranch}
         setActiveBranch={handleSetActiveBranch}
-        userRole={user.role}
+        onLogout={handleLogout}
+        userRole={user?.role}
+        user={user}
       />
+      
       <div className="flex-1 flex flex-col">
-        <Header
-          setSidebarOpen={setSidebarOpen}
-          user={user}
-          onLogout={handleLogout}
-        />
-        <main className="flex-1 overflow-y-auto p-6">
-          {content}
+        <Header setSidebarOpen={setSidebarOpen} user={user} onLogout={handleLogout} />
+        
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto">
+            {content}
+          </div>
         </main>
       </div>
     </div>
