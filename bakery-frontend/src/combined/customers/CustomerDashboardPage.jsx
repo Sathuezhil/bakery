@@ -10,7 +10,7 @@ const mockPromos = [
   { id: 2, title: 'Buy 2 Get 1 Free', desc: 'On all buns and rolls.', icon: <ShoppingBag className="w-6 h-6" /> },
 ];
 
-export default function CustomerDashboardPage({ customer, activeCustomerBranch }) {
+export default function CustomerDashboardPage({ customer, activeCustomerBranch, setActiveTab }) {
   // Mock data for demo
   const branchStats = {
     jaffna: { totalOrders: 12, loyaltyPoints: 340 },
@@ -47,9 +47,9 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch }
       </div>
       {/* Quick Actions */}
       <div className="flex gap-4 mb-6">
-        <button className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><ShoppingBag className="w-5 h-5" />Order Again</button>
-        <button className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><Clock className="w-5 h-5" />View All Orders</button>
-        <button className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><Phone className="w-5 h-5" />Contact Support</button>
+        <button onClick={() => setActiveTab && setActiveTab('orders')} className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><ShoppingBag className="w-5 h-5" />Order Again</button>
+        <button onClick={() => setActiveTab && setActiveTab('orders')} className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><Clock className="w-5 h-5" />View All Orders</button>
+        <button onClick={() => setActiveTab && setActiveTab('settings')} className="flex-1 flex items-center justify-center gap-2 bg-orange-100 text-orange-700 font-semibold py-3 rounded-xl shadow hover:bg-orange-200 transition"><Phone className="w-5 h-5" />Contact Support</button>
       </div>
       {/* Loyalty Progress */}
       <div className="mb-8">

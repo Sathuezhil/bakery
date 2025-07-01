@@ -18,7 +18,7 @@ export default function CombinedCustomerDashboard({ customer, activeTab, setActi
       <div className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">{customer.name}</h2>
         {activeTab === 'dashboard' && (
-          <CustomerDashboardPage customer={customer} activeCustomerBranch={activeCustomerBranch} />
+          <CustomerDashboardPage customer={customer} activeCustomerBranch={activeCustomerBranch} setActiveTab={setActiveTab} />
         )}
         {activeTab === 'products' && <CustomerProductsPage customer={customer} branch={activeCustomerBranch} />}
         {activeTab === 'orders' && <CustomerOrdersPage customer={customer} />}
