@@ -5,7 +5,7 @@ import CustomerOrdersPage from './CustomerOrdersPage.jsx';
 import CustomerPromotionsPage from './CustomerPromotionsPage.jsx';
 import CustomerSettingsPage from './CustomerSettingsPage.jsx';
 
-export default function CombinedCustomerDashboard({ customer, activeTab, setActiveTab, activeCustomerBranch }) {
+export default function CombinedCustomerDashboard({ customer, activeTab, setActiveTab, activeCustomerBranch, onSignOut }) {
   // Mock data for demo
   const branchStats = {
     jaffna: { totalOrders: 12, loyaltyPoints: 340 },
@@ -23,7 +23,7 @@ export default function CombinedCustomerDashboard({ customer, activeTab, setActi
         {activeTab === 'products' && <CustomerProductsPage customer={customer} branch={activeCustomerBranch} />}
         {activeTab === 'orders' && <CustomerOrdersPage customer={customer} />}
         {activeTab === 'promotions' && <CustomerPromotionsPage customer={customer} />}
-        {activeTab === 'settings' && <CustomerSettingsPage customer={customer} />}
+        {activeTab === 'settings' && <CustomerSettingsPage customer={customer} onSignOut={onSignOut} />}
       </div>
     </div>
   );

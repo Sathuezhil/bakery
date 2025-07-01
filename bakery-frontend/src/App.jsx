@@ -106,6 +106,7 @@ function App() {
               activeTab={customerTab}
               setActiveTab={setCustomerTab}
               activeCustomerBranch={activeCustomerBranch}
+              onSignOut={handleCustomerSignOut}
             />
           </main>
         </div>
