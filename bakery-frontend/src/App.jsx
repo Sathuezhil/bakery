@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import LoginPage from './components/auth/LoginPage';
@@ -29,6 +29,10 @@ import ColomboReports from './branches/colombo/ColomboReports';
 import Signup from './admin/Signup';
 import CombinedCustomerDashboard from './combined/customers/CombinedCustomerDashboard';
 import CustomerSidebar from './combined/customers/CustomerSidebar';
+import { Toaster } from './components/ui/toaster';
+import { toast } from '../hooks/use-toast';
+import { CartProvider } from './context/CartContext';
+import { OrdersProvider } from './context/OrdersContext';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,6 +43,10 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [customerTab, setCustomerTab] = useState('dashboard');
   const [activeCustomerBranch, setActiveCustomerBranch] = useState('jaffna');
+
+  useEffect(() => {
+    toast({ title: 'Test', description: 'Toast auto popup!' });
+  }, []);
 
   // Unified login handler
   const handleUnifiedLogin = (userData) => {
@@ -84,6 +92,8 @@ function App() {
         {showSignup && (
           <Signup onShowLogin={() => setShowSignup(false)} />
         )}
+        <button onClick={() => toast({ title: 'Test', description: 'Toast works!' })}>Test Toast</button>
+        <Toaster />
       </div>
     );
   }
@@ -110,6 +120,7 @@ function App() {
             />
           </main>
         </div>
+        <Toaster />
       </div>
     );
   }
@@ -130,6 +141,7 @@ function App() {
             <CombinedCustomerDashboard customer={{ id: 1, name: 'Arun Kumar' }} activeTab={customerTab} setActiveTab={setCustomerTab} />
           </main>
         </div>
+        <Toaster />
       </div>
     );
   }
@@ -214,8 +226,17 @@ function App() {
           </div>
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
 
-export default App;
+export default function WrappedApp() {
+  return (
+    <OrdersProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </OrdersProvider>
+  );
+}

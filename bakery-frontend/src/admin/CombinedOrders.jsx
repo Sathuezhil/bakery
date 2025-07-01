@@ -17,6 +17,7 @@ import {
   Mail, 
   Calendar
 } from 'lucide-react';
+import { useOrders } from '../context/OrdersContext';
 
 const orderStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'cancelled'];
 
@@ -141,16 +142,17 @@ const colomboOrders = [
 const combinedOrders = [...jaffnaOrders, ...colomboOrders];
 
 export default function CombinedOrders() {
-  const [orders] = useState(combinedOrders);
+  const { orders } = useOrders();
+  const allOrders = [...orders, ...combinedOrders]; 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = allOrders.filter(order => {
+    const matchesSearch = (order.id?.toString() || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.name || order.customer || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
     const matchesBranch = selectedBranch === 'all' || order.branch === selectedBranch;
     return matchesSearch && matchesStatus && matchesBranch;

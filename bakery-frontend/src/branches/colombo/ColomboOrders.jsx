@@ -19,117 +19,21 @@ import {
   Calendar,
   DollarSign
 } from 'lucide-react';
+import { useOrders } from '../../context/OrdersContext';
 
 const orderStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'cancelled'];
 
-const initialOrders = [
-  {
-    id: 'CMB-101',
-    customer: {
-      name: 'Nimal Perera',
-      email: 'nimal.perera@colombobakery.com',
-      phone: '+94 11 234 5678',
-      address: '123 Galle Road, Colombo 03'
-    },
-    items: [
-      { name: 'Chocolate Croissant', quantity: 3, price: 180 },
-      { name: 'Red Velvet Cupcake', quantity: 2, price: 300 }
-    ],
-    total: 3*180 + 2*300,
-    status: 'preparing',
-    orderDate: '2024-02-10T09:00:00',
-    deliveryDate: '2024-02-10T13:00:00',
-    paymentMethod: 'Credit Card',
-    notes: 'Deliver to office reception.'
-  },
-  {
-    id: 'CMB-102',
-    customer: {
-      name: 'Dilani Fernando',
-      email: 'dilani.fernando@colombobakery.com',
-      phone: '+94 11 876 5432',
-      address: '45 Marine Drive, Colombo 04'
-    },
-    items: [
-      { name: 'Bread', quantity: 2, price: 200 },
-      { name: 'Pol Roti', quantity: 4, price: 150 }
-    ],
-    total: 2*200 + 4*150,
-    status: 'ready',
-    orderDate: '2024-02-11T10:15:00',
-    deliveryDate: '2024-02-11T15:00:00',
-    paymentMethod: 'Cash',
-    notes: 'Leave at security desk.'
-  },
-  {
-    id: 'CMB-103',
-    customer: {
-      name: 'Suresh De Silva',
-      email: 'suresh.desilva@colombobakery.com',
-      phone: '+94 11 345 6789',
-      address: '78 Flower Road, Colombo 07'
-    },
-    items: [
-      { name: 'Almond Cookies', quantity: 5, price: 120 },
-      { name: 'Strawberry Tart', quantity: 2, price: 180 }
-    ],
-    total: 5*120 + 2*180,
-    status: 'confirmed',
-    orderDate: '2024-02-12T14:30:00',
-    deliveryDate: '2024-02-13T12:00:00',
-    paymentMethod: 'Bank Transfer',
-    notes: 'Birthday order for daughter.'
-  },
-  {
-    id: 'CMB-104',
-    customer: {
-      name: 'Harini Jayasuriya',
-      email: 'harini.jaya@colombobakery.com',
-      phone: '+94 11 456 7890',
-      address: '99 Lotus Lane, Colombo 05'
-    },
-    items: [
-      { name: 'Egg Roti', quantity: 6, price: 70 },
-      { name: 'Fish Bun', quantity: 3, price: 90 }
-    ],
-    total: 6*70 + 3*90,
-    status: 'delivered',
-    orderDate: '2024-02-13T08:45:00',
-    deliveryDate: '2024-02-13T13:30:00',
-    paymentMethod: 'Credit Card',
-    notes: ''
-  },
-  {
-    id: 'CMB-105',
-    customer: {
-      name: 'Anjali Peris',
-      email: 'anjali.peris@colombobakery.com',
-      phone: '+94 11 678 9012',
-      address: '34 Temple Road, Colombo 06'
-    },
-    items: [
-      { name: 'Pol Roti', quantity: 2, price: 150 },
-      { name: 'Vadai', quantity: 10, price: 80 }
-    ],
-    total: 2*150 + 10*80,
-    status: 'out-for-delivery',
-    orderDate: '2024-02-14T07:30:00',
-    deliveryDate: '2024-02-14T12:00:00',
-    paymentMethod: 'Credit Card',
-    notes: 'Call before delivery.'
-  }
-];
-
 export default function ColomboOrders() {
-  const [orders, setOrders] = useState(initialOrders);
+  const { orders } = useOrders();
+  const branchOrders = orders.filter(order => order.branch === 'colombo');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = branchOrders.filter(order => {
+    const matchesSearch = (order.id?.toString() || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.name || order.customer || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
@@ -161,9 +65,7 @@ export default function ColomboOrders() {
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ));
+    // Implementation of updateOrderStatus function
   };
 
   const formatDate = (dateString) => {
@@ -178,11 +80,11 @@ export default function ColomboOrders() {
 
   const getOrderStats = () => {
     const stats = {
-      total: orders.length,
-      pending: orders.filter(o => o.status === 'pending').length,
-      preparing: orders.filter(o => o.status === 'preparing').length,
-      ready: orders.filter(o => o.status === 'ready').length,
-      delivered: orders.filter(o => o.status === 'delivered').length
+      total: branchOrders.length,
+      pending: branchOrders.filter(o => o.status === 'pending').length,
+      preparing: branchOrders.filter(o => o.status === 'preparing').length,
+      ready: branchOrders.filter(o => o.status === 'ready').length,
+      delivered: branchOrders.filter(o => o.status === 'delivered').length
     };
     return stats;
   };

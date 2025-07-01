@@ -91,6 +91,22 @@ export default function CustomerSettingsPage({ customer, onSignOut }) {
             <input className="w-full p-2 border rounded bg-gray-50" value={editEmail} readOnly />
           )}
         </div>
+        <div>
+          <label className="block text-sm font-medium">Phone Number</label>
+          {editMode ? (
+            <input className="w-full p-2 border rounded" value={customer.phone || '+94 77 123 4567'} readOnly />
+          ) : (
+            <input className="w-full p-2 border rounded bg-gray-50" value={customer.phone || '+94 77 123 4567'} readOnly />
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Address</label>
+          {editMode ? (
+            <input className="w-full p-2 border rounded" value={customer.address || '123 Main St, Jaffna'} readOnly />
+          ) : (
+            <input className="w-full p-2 border rounded bg-gray-50" value={customer.address || '123 Main St, Jaffna'} readOnly />
+          )}
+        </div>
         {editMode ? (
           <div className="flex gap-2">
             <button onClick={handleEditSave} className="px-4 py-2 bg-orange-500 text-white rounded-lg">Save</button>

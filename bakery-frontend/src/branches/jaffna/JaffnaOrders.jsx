@@ -19,116 +19,77 @@ import {
   Calendar,
   DollarSign
 } from 'lucide-react';
+import { useOrders } from '../../context/OrdersContext';
 
 const orderStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'cancelled'];
 
-const initialOrders = [
-  {
-    id: 'ORD-001',
-    customer: {
-      name: 'Emma Wilson',
-      email: 'emma.wilson@email.com',
-      phone: '+94 77 123 4567',
-      address: '123 Oak Street, Colombo 00300'
-    },
-    items: [
-      { name: 'Kimbula Bun', quantity: 2, price: 100 },
-      { name: 'Fish Bun', quantity: 4, price: 70 }
-    ],
-    total: 2*100 + 4*70,
-    status: 'preparing',
-    orderDate: '2024-01-15T10:30:00',
-    deliveryDate: '2024-01-15T15:30:00',
-    paymentMethod: 'Credit Card',
-    notes: 'Please pack buns separately.'
-  },
-  {
-    id: 'ORD-002',
-    customer: {
-      name: 'Michael Brown',
-      email: 'michael.brown@email.com',
-      phone: '+94 76 234 5678',
-      address: '456 Galle Road, Dehiwala 10350'
-    },
-    items: [
-      { name: 'Bread', quantity: 1, price: 200 },
-      { name: 'Pol Roti', quantity: 5, price: 150 }
-    ],
-    total: 1*200 + 5*150,
-    status: 'ready',
-    orderDate: '2024-01-15T09:15:00',
-    deliveryDate: '2024-01-15T14:00:00',
-    paymentMethod: 'Cash',
-    notes: ''
-  },
-  {
-    id: 'ORD-003',
-    customer: {
-      name: 'Sarah Davis',
-      email: 'sarah.davis@email.com',
-      phone: '+94 71 345 6789',
-      address: '789 Maple Drive, Kandy 20000'
-    },
-    items: [
-      { name: 'Red Velvet Cupcake', quantity: 6, price: 300 }
-    ],
-    total: 6*300,
-    status: 'confirmed',
-    orderDate: '2024-01-14T16:45:00',
-    deliveryDate: '2024-01-18T12:00:00',
-    paymentMethod: 'Bank Transfer',
-    notes: 'Birthday cupcakes, please add candles.'
-  },
-  {
-    id: 'ORD-004',
-    customer: {
-      name: 'James Miller',
-      email: 'james.miller@email.com',
-      phone: '+94 72 456 7890',
-      address: '321 Elm Street, Negombo 11500'
-    },
-    items: [
-      { name: 'Vadai', quantity: 10, price: 80 },
-      { name: 'Egg Roti', quantity: 3, price: 70 }
-    ],
-    total: 10*80 + 3*70,
-    status: 'delivered',
-    orderDate: '2024-01-14T11:20:00',
-    deliveryDate: '2024-01-14T17:30:00',
-    paymentMethod: 'Credit Card',
-    notes: ''
-  },
-  {
-    id: 'ORD-005',
-    customer: {
-      name: 'Lisa Johnson',
-      email: 'lisa.johnson@email.com',
-      phone: '+94 75 567 8901',
-      address: '654 Cedar Lane, Galle 80000'
-    },
-    items: [
-      { name: 'Strawberry Tart', quantity: 2, price: 180 },
-      { name: 'Almond Cookies', quantity: 1, price: 120 }
-    ],
-    total: 2*180 + 1*120,
-    status: 'out-for-delivery',
-    orderDate: '2024-01-15T08:00:00',
-    deliveryDate: '2024-01-15T13:00:00',
-    paymentMethod: 'Credit Card',
-    notes: 'Tarts for tea party.'
-  }
-];
+const jaffnaOrders = [ {
+  id: 'ORD-001',
+  customer: { name: 'Emma Wilson', email: 'emma.wilson@email.com', phone: '+94 77 123 4567', address: '123 Oak Street, Colombo 00300' },
+  items: [ { name: 'Kimbula Bun', quantity: 2, price: 100 }, { name: 'Fish Bun', quantity: 4, price: 70 } ],
+  total: 2*100 + 4*70,
+  status: 'preparing',
+  orderDate: '2024-01-15T10:30:00',
+  deliveryDate: '2024-01-15T15:30:00',
+  paymentMethod: 'Credit Card',
+  notes: 'Please pack buns separately.'
+},
+{
+  id: 'ORD-002',
+  customer: { name: 'Michael Brown', email: 'michael.brown@email.com', phone: '+94 76 234 5678', address: '456 Galle Road, Dehiwala 10350' },
+  items: [ { name: 'Bread', quantity: 1, price: 200 }, { name: 'Pol Roti', quantity: 5, price: 150 } ],
+  total: 1*200 + 5*150,
+  status: 'ready',
+  orderDate: '2024-01-15T09:15:00',
+  deliveryDate: '2024-01-15T14:00:00',
+  paymentMethod: 'Cash',
+  notes: ''
+},
+{
+  id: 'ORD-003',
+  customer: { name: 'Sarah Davis', email: 'sarah.davis@email.com', phone: '+94 71 345 6789', address: '789 Maple Drive, Kandy 20000' },
+  items: [ { name: 'Red Velvet Cupcake', quantity: 6, price: 300 } ],
+  total: 6*300,
+  status: 'confirmed',
+  orderDate: '2024-01-14T16:45:00',
+  deliveryDate: '2024-01-18T12:00:00',
+  paymentMethod: 'Bank Transfer',
+  notes: 'Birthday cupcakes, please add candles.'
+},
+{
+  id: 'ORD-004',
+  customer: { name: 'James Miller', email: 'james.miller@email.com', phone: '+94 72 456 7890', address: '321 Elm Street, Negombo 11500' },
+  items: [ { name: 'Vadai', quantity: 10, price: 80 }, { name: 'Egg Roti', quantity: 3, price: 70 } ],
+  total: 10*80 + 3*70,
+  status: 'delivered',
+  orderDate: '2024-01-14T11:20:00',
+  deliveryDate: '2024-01-14T17:30:00',
+  paymentMethod: 'Credit Card',
+  notes: ''
+},
+{
+  id: 'ORD-005',
+  customer: { name: 'Lisa Johnson', email: 'lisa.johnson@email.com', phone: '+94 75 567 8901', address: '654 Cedar Lane, Galle 80000' },
+  items: [ { name: 'Strawberry Tart', quantity: 2, price: 180 }, { name: 'Almond Cookies', quantity: 1, price: 120 } ],
+  total: 2*180 + 1*120,
+  status: 'out-for-delivery',
+  orderDate: '2024-01-15T08:00:00',
+  deliveryDate: '2024-01-15T13:00:00',
+  paymentMethod: 'Credit Card',
+  notes: 'Tarts for tea party.'
+}];
 
 export default function JaffnaOrders() {
-  const [orders, setOrders] = useState(initialOrders);
+  const { orders } = useOrders();
+  const branchOrders = orders.filter(order => order.branch === 'jaffna');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = branchOrders.filter(order => {
+    const matchesSearch = (order.id?.toString() || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.name || order.customer || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
@@ -160,9 +121,7 @@ export default function JaffnaOrders() {
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status: newStatus } : order
-    ));
+    // Implementation of updateOrderStatus function
   };
 
   const formatDate = (dateString) => {
@@ -177,11 +136,11 @@ export default function JaffnaOrders() {
 
   const getOrderStats = () => {
     const stats = {
-      total: orders.length,
-      pending: orders.filter(o => o.status === 'pending').length,
-      preparing: orders.filter(o => o.status === 'preparing').length,
-      ready: orders.filter(o => o.status === 'ready').length,
-      delivered: orders.filter(o => o.status === 'delivered').length
+      total: branchOrders.length,
+      pending: branchOrders.filter(o => o.status === 'pending').length,
+      preparing: branchOrders.filter(o => o.status === 'preparing').length,
+      ready: branchOrders.filter(o => o.status === 'ready').length,
+      delivered: branchOrders.filter(o => o.status === 'delivered').length
     };
     return stats;
   };

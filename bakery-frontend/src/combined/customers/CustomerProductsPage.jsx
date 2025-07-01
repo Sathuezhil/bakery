@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
+import { toast } from '../../../hooks/use-toast';
+import { useCart } from '../../context/CartContext';
 const jaffnaProducts = [
   {
     id: 1,
@@ -226,7 +227,9 @@ const getStatusColor = (status) => {
 };
 
 export default function CustomerProductsPage({ branch = 'jaffna' }) {
+  const { addToCart } = useCart();
   const products = branch === 'colombo' ? colomboProducts : jaffnaProducts;
+ 
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-orange-600">Products - {branch.charAt(0).toUpperCase() + branch.slice(1)}</h3>
@@ -249,7 +252,15 @@ export default function CustomerProductsPage({ branch = 'jaffna' }) {
                   <span className="text-xs text-gray-500">Stock: {product.stock}</span>
                 </div>
               </div>
-              <button className="mt-4 px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition">Add to Cart</button>
+              <button
+              className="mt-3 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors w-full"
+              onClick={() => {
+                addToCart(product);
+                toast({ title: 'Added successfully!', description: `${product.name} added to your orders.` });
+              }}
+            >
+              Buy Now
+            </button>
             </CardContent>
           </Card>
         ))}
