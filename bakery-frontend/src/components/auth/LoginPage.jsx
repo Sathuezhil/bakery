@@ -29,7 +29,7 @@ export default function LoginPage({ onLogin, onShowSignup }) {
     setError('');
 
     setTimeout(() => {
-      // Check admin users
+     
       const admin = mockAdmins.find(
         (a) => a.username === credentials.username && a.password === credentials.password
       );
@@ -38,7 +38,7 @@ export default function LoginPage({ onLogin, onShowSignup }) {
         setIsLoading(false);
         return;
       }
-      // Check customer users
+      
       const customer = mockCustomers.find(
         (c) => c.username === credentials.username && c.password === credentials.password
       );

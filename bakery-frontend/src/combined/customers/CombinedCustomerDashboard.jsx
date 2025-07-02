@@ -16,7 +16,6 @@ export default function CombinedCustomerDashboard({ customer, activeTab, setActi
     <div className="flex min-h-screen">
       {/* Sidebar is now handled by App.jsx */}
       <div className="flex-1 p-6">
-        <h2 className="text-2xl font-bold mb-4">{customer.name}</h2>
         {activeTab === 'dashboard' && (
           <CustomerDashboardPage customer={customer} activeCustomerBranch={activeCustomerBranch} setActiveTab={setActiveTab} />
         )}
