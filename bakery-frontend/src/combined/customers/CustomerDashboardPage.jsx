@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Gift, ShoppingBag, Phone, Trophy, Star, Loader2, CheckCircle, Clock } from 'lucide-react';
 
 const mockOrders = [
@@ -5,10 +6,28 @@ const mockOrders = [
   { id: 100, date: '2024-06-05', total: 800, status: 'Pending' },
 ];
 const nextRewardPoints = 200;
-const mockPromos = [
-  { id: 1, title: '10% OFF on Cakes', desc: 'All cakes this week!', icon: <Gift className="w-7 h-7" /> },
-  { id: 2, title: 'Buy 2 Get 1 Free', desc: 'On all buns and rolls.', icon: <ShoppingBag className="w-7 h-7" /> },
-];
+
+const defaultPromo = {
+  id: 'default',
+  title: 'Welcome Offer!',
+  description: 'Get 5% off on your first order!',
+  code: 'WELCOME5',
+  expires: '2099-12-31',
+};
+
+function getPromoIcon(title) {
+  if (title.toLowerCase().includes('cake')) return <Gift className="w-7 h-7" />;
+  if (title.toLowerCase().includes('bun')) return <ShoppingBag className="w-7 h-7" />;
+  return <Gift className="w-7 h-7" />;
+}
+
+function getUsedPromos() {
+  try {
+    return JSON.parse(localStorage.getItem('usedPromos') || '[]');
+  } catch {
+    return [];
+  }
+}
 
 export default function CustomerDashboardPage({ customer, activeCustomerBranch, setActiveTab }) {
   const branchStats = {
@@ -18,6 +37,17 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
   const isBranchSelected = activeCustomerBranch === 'jaffna' || activeCustomerBranch === 'colombo';
   const totalOrders = isBranchSelected ? branchStats[activeCustomerBranch].totalOrders : 12;
   const currentPoints = isBranchSelected ? branchStats[activeCustomerBranch].loyaltyPoints : 150;
+
+  const [promos, setPromos] = useState([]);
+  useEffect(() => {
+    fetch('http://localhost:5000/api/promotions')
+      .then(res => res.json())
+      .then(data => {
+        const usedPromos = getUsedPromos();
+        const activePromos = data.filter(p => new Date(p.expires) >= new Date() && !usedPromos.includes(p.code));
+        setPromos(activePromos.length > 0 ? activePromos : [defaultPromo]);
+      });
+  }, []);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-8 animate-fade-in">
@@ -35,12 +65,12 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
       </div>
       {/* Promotions Carousel */}
       <div className="mb-8 overflow-x-auto flex gap-6 pb-2 hide-scrollbar">
-        {mockPromos.map((promo) => (
-          <div key={promo.id} className="min-w-[240px] bg-gradient-to-br from-orange-400 to-amber-300 text-white rounded-2xl shadow-xl p-5 flex items-center gap-4 hover:scale-105 transition-transform duration-200">
-            <div className="bg-white/30 rounded-full p-3 flex items-center justify-center">{promo.icon}</div>
+        {promos.map((promo) => (
+          <div key={promo._id || promo.id} className="min-w-[240px] bg-gradient-to-br from-orange-400 to-amber-300 text-white rounded-2xl shadow-xl p-5 flex items-center gap-4 hover:scale-105 transition-transform duration-200">
+            <div className="bg-white/30 rounded-full p-3 flex items-center justify-center">{getPromoIcon(promo.title)}</div>
             <div>
               <div className="font-bold text-lg">{promo.title}</div>
-              <div className="text-sm opacity-90">{promo.desc}</div>
+              <div className="text-sm opacity-90">{promo.description || promo.desc}</div>
             </div>
           </div>
         ))}
