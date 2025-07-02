@@ -126,11 +126,13 @@ export default function JaffnaOrders() {
     const order = branchOrders.find(o => o.id === orderId);
     if (order) {
       order.status = newStatus;
-      addNotification({
-        title: 'Order Confirmed',
-        customer: order.customer?.id || order.customer?.email || order.customer,
-        message: 'Your order has been confirmed.'
-      });
+      if (newStatus === 'confirmed') {
+        addNotification({
+          title: 'Order Confirmed',
+          customer: order.customer?.id || order.customer?.email || order.customer,
+          message: 'Your order has been confirmed.'
+        });
+      }
     }
   };
 

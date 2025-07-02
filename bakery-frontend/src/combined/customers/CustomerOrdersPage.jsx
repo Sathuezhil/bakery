@@ -23,6 +23,16 @@ export default function CustomerOrdersPage({ customer, branch }) {
   const [newCard, setNewCard] = useState({ number: '', expiry: '', cvv: '' });
   const billRef = useRef();
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [orderToCancel, setOrderToCancel] = useState(null);
+  const cancelReasons = [
+    'Ordered by mistake',
+    'Found a better price elsewhere',
+    'Delivery time too long',
+    'Other',
+  ];
+  const [refundMsg, setRefundMsg] = useState('');
 
   const lastPaidTotal = lastPaidCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -248,12 +258,26 @@ export default function CustomerOrdersPage({ customer, branch }) {
                   <div className="text-xs text-gray-500">Date: {order.date || order.orderDate?.slice(0,10)}</div>
                   <div className="text-xs text-gray-500">Status: <span className="font-semibold">{order.status}</span></div>
                 </div>
-                <button
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
-                  onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
-                >
-                  {expandedOrderId === order.id ? 'Hide Details' : 'View Details'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                    onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                  >
+                    {expandedOrderId === order.id ? 'Hide Details' : 'View Details'}
+                  </button>
+                  {(order.status === 'Pending' || order.status === 'Confirmed') && (
+                    <button
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
+                      onClick={() => {
+                        setOrderToCancel(order);
+                        setCancelModalOpen(true);
+                        setCancelReason('');
+                      }}
+                    >
+                      Cancel Order
+                    </button>
+                  )}
+                </div>
               </div>
               {/* Status Progress Bar */}
               <div className="flex items-center gap-2 mt-2 mb-2">
@@ -290,6 +314,66 @@ export default function CustomerOrdersPage({ customer, branch }) {
           ))}
         </ul>
       </ul>
+      {/* Cancel Reason Modal */}
+      {cancelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold mb-4">Why are you cancelling this order?</h2>
+            <form onSubmit={e => {
+              e.preventDefault();
+              if (!cancelReason) return;
+              if (orderToCancel) orderToCancel.status = 'Cancelled';
+              setCancelModalOpen(false);
+              setOrderToCancel(null);
+              setCancelReason('');
+              setRefundMsg('Your cash is refunded');
+              setTimeout(() => setRefundMsg(''), 3000);
+            }}>
+              <div className="space-y-3 mb-4">
+                {cancelReasons.map(reason => (
+                  <label key={reason} className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="cancelReason"
+                      value={reason}
+                      checked={cancelReason === reason}
+                      onChange={() => setCancelReason(reason)}
+                    />
+                    {reason}
+                  </label>
+                ))}
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                  onClick={() => {
+                    setCancelModalOpen(false);
+                    setOrderToCancel(null);
+                    setCancelReason('');
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className={`px-4 py-2 rounded bg-red-500 text-white font-semibold ${!cancelReason ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'}`}
+                  disabled={!cancelReason}
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {refundMsg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs text-center">
+            <span className="text-green-700 font-bold text-lg">{refundMsg}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
