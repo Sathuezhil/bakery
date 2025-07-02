@@ -20,6 +20,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import { useOrders } from '../../context/OrdersContext';
+import { useNotifications } from '../../context/NotificationContext';
 
 const orderStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'out-for-delivery', 'delivered', 'cancelled'];
 
@@ -85,6 +86,7 @@ export default function JaffnaOrders() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const { addNotification } = useNotifications();
 
   const filteredOrders = branchOrders.filter(order => {
     const matchesSearch = (order.id?.toString() || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -121,7 +123,15 @@ export default function JaffnaOrders() {
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
-    // Implementation of updateOrderStatus function
+    const order = branchOrders.find(o => o.id === orderId);
+    if (order) {
+      order.status = newStatus;
+      addNotification({
+        title: 'Order Confirmed',
+        customer: order.customer?.id || order.customer?.email || order.customer,
+        message: 'Your order has been confirmed.'
+      });
+    }
   };
 
   const formatDate = (dateString) => {

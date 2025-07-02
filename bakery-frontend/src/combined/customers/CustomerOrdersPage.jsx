@@ -1,13 +1,14 @@
 import { useCart } from "@/context/CartContext";
 import { useState, useRef } from 'react';
 import { useOrders } from '../../context/OrdersContext';
+import { useNotifications } from '../../context/NotificationContext';
 
 const mockOrders = [
   { id: 1, date: '2024-06-01', items: 3, total: 1400, status: 'Delivered' },
   { id: 2, date: '2024-05-28', items: 1, total: 60, status: 'Pending' },
 ];
 
-export default function CustomerOrdersPage() {
+export default function CustomerOrdersPage({ customer, branch }) {
   const { cart, removeFromCart, updateCartItemQuantity, clearCart } = useCart();
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -17,6 +18,7 @@ export default function CustomerOrdersPage() {
   // Simulate saved card (in real app, get from user profile)
   const hasSavedCard = true;
   const { addOrder, orders: allOrders } = useOrders();
+  const { addNotification } = useNotifications();
   const [cardType, setCardType] = useState('saved'); // 'saved' or 'new'
   const [newCard, setNewCard] = useState({ number: '', expiry: '', cvv: '' });
   const billRef = useRef();
@@ -145,18 +147,24 @@ export default function CustomerOrdersPage() {
                       setLastPaidCart(cart);
                       setPaymentSuccess(true);
                       // Add order to OrdersContext
+                      const orderId = Date.now();
                       addOrder({
-                        id: Date.now(),
+                        id: orderId,
                         date: new Date().toISOString().slice(0,10),
                         items: cart,
                         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
                         status: 'Pending',
-                        branch: 'jaffna',
-                        customer: 'Arun Kumar',
+                        branch: branch,
+                        customer: customer,
                         paymentMethod: cardType === 'saved' ? 'Saved Card' : 'New Card',
                         cardInfo: cardType === 'new' ? { ...newCard } : { number: '**** **** **** 1234' },
                       });
                       clearCart();
+                      addNotification({
+                        title: 'New Order',
+                        branch: branch,
+                        message: 'A new order has been placed.'
+                      });
                     }}
                   >
                     Pay
@@ -185,16 +193,22 @@ export default function CustomerOrdersPage() {
                       setLastPaidCart(cart);
                       setPaymentSuccess(true);
                       // Add order to OrdersContext
+                      const orderId = Date.now();
                       addOrder({
-                        id: Date.now(),
+                        id: orderId,
                         date: new Date().toISOString().slice(0,10),
                         items: cart,
                         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
                         status: 'Pending',
-                        branch: 'jaffna', // or get from props/context
-                        customer: 'Arun Kumar', // or get from user context
+                        branch: branch, // or get from props/context
+                        customer: customer, // or get from user context
                       });
                       clearCart();
+                      addNotification({
+                        title: 'New Order',
+                        branch: branch,
+                        message: 'A new order has been placed.'
+                      });
                     }}
                   >
                     Pay

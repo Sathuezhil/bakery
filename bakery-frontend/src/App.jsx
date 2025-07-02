@@ -30,10 +30,9 @@ import Signup from './admin/Signup';
 import CombinedCustomerDashboard from './combined/customers/CombinedCustomerDashboard';
 import CustomerSidebar from './combined/customers/CustomerSidebar';
 import CustomerHeader from './combined/customers/CustomerHeader';
-import { Toaster } from './components/ui/toaster';
-import { toast } from '../hooks/use-toast';
 import { CartProvider } from './context/CartContext';
 import { OrdersProvider } from './context/OrdersContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -44,10 +43,6 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [customerTab, setCustomerTab] = useState('dashboard');
   const [activeCustomerBranch, setActiveCustomerBranch] = useState('jaffna');
-
-  useEffect(() => {
-    toast({ title: 'Test', description: 'Toast auto popup!' });
-  }, []);
 
   // Unified login handler
   const handleUnifiedLogin = (userData) => {
@@ -93,8 +88,6 @@ function App() {
         {showSignup && (
           <Signup onShowLogin={() => setShowSignup(false)} />
         )}
-        <button onClick={() => toast({ title: 'Test', description: 'Toast works!' })}>Test Toast</button>
-        <Toaster />
       </div>
     );
   }
@@ -111,7 +104,7 @@ function App() {
           setActiveCustomerBranch={setActiveCustomerBranch}
         />
         <div className="flex-1 flex flex-col">
-          <CustomerHeader />
+          <CustomerHeader customer={customerUser} />
           <main className="flex-1 overflow-y-auto p-6">
             <CombinedCustomerDashboard
               customer={customerUser}
@@ -122,7 +115,6 @@ function App() {
             />
           </main>
         </div>
-        <Toaster />
       </div>
     );
   }
@@ -143,7 +135,6 @@ function App() {
             <CombinedCustomerDashboard customer={{ id: 1, name: 'Arun Kumar' }} activeTab={customerTab} setActiveTab={setCustomerTab} />
           </main>
         </div>
-        <Toaster />
       </div>
     );
   }
@@ -228,7 +219,6 @@ function App() {
           </div>
         </main>
       </div>
-      <Toaster />
     </div>
   );
 }
@@ -237,7 +227,9 @@ export default function WrappedApp() {
   return (
     <OrdersProvider>
       <CartProvider>
-        <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </CartProvider>
     </OrdersProvider>
   );

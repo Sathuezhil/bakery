@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, Bell, Search, User, LogOut, Crown, Building2, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import NotificationBell from './NotificationBell';
 
 export default function Header({ setSidebarOpen, user, onLogout }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLowStock, setShowLowStock] = useState(false);
+  // Remove order modal state and effect
 
   // Sample low stock products
   const lowStockProducts = [

@@ -20,7 +20,7 @@ export default function CombinedCustomerDashboard({ customer, activeTab, setActi
           <CustomerDashboardPage customer={customer} activeCustomerBranch={activeCustomerBranch} setActiveTab={setActiveTab} />
         )}
         {activeTab === 'products' && <CustomerProductsPage customer={customer} branch={activeCustomerBranch} />}
-        {activeTab === 'orders' && <CustomerOrdersPage customer={customer} />}
+        {activeTab === 'orders' && <CustomerOrdersPage customer={customer} branch={activeCustomerBranch} />}
         {activeTab === 'promotions' && <CustomerPromotionsPage customer={customer} />}
         {activeTab === 'settings' && <CustomerSettingsPage customer={customer} onSignOut={onSignOut} />}
       </div>
