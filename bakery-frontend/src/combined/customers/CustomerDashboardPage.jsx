@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Gift, ShoppingBag, Phone, Trophy, Star, Loader2, CheckCircle, Clock } from 'lucide-react';
+import { useOrders } from '../../context/OrdersContext';
 
 const mockOrders = [
-  { id: 101, date: '2024-06-10', total: 1200, status: 'Delivered' },
-  { id: 100, date: '2024-06-05', total: 800, status: 'Pending' },
+  { id: 101, date: '2024-06-10', total: 1200, status: 'Delivered', branch: 'jaffna' },
+  { id: 100, date: '2024-06-05', total: 800, status: 'Pending', branch: 'colombo' },
 ];
 const nextRewardPoints = 200;
 
@@ -30,13 +31,16 @@ function getUsedPromos() {
 }
 
 export default function CustomerDashboardPage({ customer, activeCustomerBranch, setActiveTab }) {
-  const branchStats = {
-    jaffna: { totalOrders: 12, loyaltyPoints: 340 },
-    colombo: { totalOrders: 7, loyaltyPoints: 210 },
-  };
-  const isBranchSelected = activeCustomerBranch === 'jaffna' || activeCustomerBranch === 'colombo';
-  const totalOrders = isBranchSelected ? branchStats[activeCustomerBranch].totalOrders : 12;
-  const currentPoints = isBranchSelected ? branchStats[activeCustomerBranch].loyaltyPoints : 150;
+  const { orders } = useOrders();
+  // Combine mockOrders and new orders
+  const allOrders = [...orders, ...mockOrders];
+  // Filter by branch if selected
+  const filteredOrders = activeCustomerBranch
+    ? allOrders.filter(order => order.branch === activeCustomerBranch)
+    : allOrders;
+  const totalOrders = filteredOrders.length;
+  // Loyalty points logic can be updated similarly if needed
+  const currentPoints = 150;
 
   const [promos, setPromos] = useState([]);
   useEffect(() => {
@@ -48,6 +52,9 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
         setPromos(activePromos.length > 0 ? activePromos : [defaultPromo]);
       });
   }, []);
+
+  // Sort orders by date descending (newest first)
+  const sortedOrders = [...filteredOrders].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-8 animate-fade-in">
@@ -89,7 +96,6 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
         </div>
         <div className="w-full h-5 bg-orange-100 rounded-full overflow-hidden relative">
           <div className="h-5 bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-700" style={{ width: `${Math.min((currentPoints / nextRewardPoints) * 100, 100)}%` }}></div>
-          <Star className="w-6 h-6 text-amber-400 absolute -right-3 -top-2 animate-pulse" style={{ left: `calc(${Math.min((currentPoints / nextRewardPoints) * 100, 100)}% - 12px)` }} />
         </div>
         <div className="text-sm text-orange-600 mt-1 font-medium">{nextRewardPoints - currentPoints} points to next reward!</div>
       </div>
@@ -108,7 +114,7 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-10 animate-fade-in-up border border-orange-100">
         <h3 className="text-2xl font-bold text-orange-700 mb-6 flex items-center gap-3"><ShoppingBag className="w-7 h-7 text-orange-400" />Recent Orders</h3>
         <ul className="divide-y divide-orange-100">
-          {mockOrders.map((order) => (
+          {sortedOrders.map((order) => (
             <li key={order.id} className="py-4 flex justify-between items-center hover:bg-orange-50 rounded-xl transition">
               <div>
                 <div className="font-semibold text-orange-800 flex items-center gap-2 text-lg">Order #{order.id} {order.status === 'Delivered' ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />}</div>

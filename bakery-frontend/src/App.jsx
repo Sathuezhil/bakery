@@ -29,6 +29,7 @@ import ColomboReports from './branches/colombo/ColomboReports';
 import Signup from './admin/Signup';
 import CombinedCustomerDashboard from './combined/customers/CombinedCustomerDashboard';
 import CustomerSidebar from './combined/customers/CustomerSidebar';
+import CustomerHeader from './combined/customers/CustomerHeader';
 import { Toaster } from './components/ui/toaster';
 import { toast } from '../hooks/use-toast';
 import { CartProvider } from './context/CartContext';
@@ -110,6 +111,7 @@ function App() {
           setActiveCustomerBranch={setActiveCustomerBranch}
         />
         <div className="flex-1 flex flex-col">
+          <CustomerHeader />
           <main className="flex-1 overflow-y-auto p-6">
             <CombinedCustomerDashboard
               customer={customerUser}

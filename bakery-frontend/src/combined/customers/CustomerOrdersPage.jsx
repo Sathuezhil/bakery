@@ -30,7 +30,7 @@ export default function CustomerOrdersPage() {
       <ul className="space-y-4">
         {/* Show payment success and bill even if cart is empty */}
         {paymentSuccess && (
-          <li className="p-4 bg-green-50 rounded border border-green-300 max-w-md mx-auto" ref={billRef}>
+          <li className="bill-section p-4 bg-green-50 rounded border border-green-300 max-w-md mx-auto" ref={billRef}>
             <div className="text-lg font-bold text-green-700 mb-2">Payment Successful!</div>
             <div className="mb-2">Thank you for your order. Here is your bill:</div>
             <table className="min-w-full text-sm text-gray-700 border border-green-200 rounded mb-2">

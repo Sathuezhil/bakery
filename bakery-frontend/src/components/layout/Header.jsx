@@ -57,7 +57,7 @@ export default function Header({ setSidebarOpen, user, onLogout }) {
         </div>
         {/* Right side */}
         <div className="flex items-center space-x-6">
-          {/* Notification Bell */}
+          {/* Notification Bell (Low Stock) */}
           <div className="relative">
             <button onClick={() => setShowLowStock(true)} className="focus:outline-none">
               <Bell className="w-6 h-6 text-orange-500" />
