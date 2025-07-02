@@ -23,16 +23,24 @@ export default function CustomerSettingsPage({ customer, onSignOut }) {
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState(customer.name);
   const [editEmail, setEditEmail] = useState(customer.email || 'arun@example.com');
+  const [editPhone, setEditPhone] = useState(customer.phone || '+94 77 123 4567');
+  const [editAddress, setEditAddress] = useState(customer.address || '123 Main St, Jaffna');
   const [editSaved, setEditSaved] = useState(false);
   const handleEditSave = () => {
     setEditMode(false);
     setEditSaved(true);
+    customer.name = editName;
+    customer.email = editEmail;
+    customer.phone = editPhone;
+    customer.address = editAddress;
     setTimeout(() => setEditSaved(false), 1500);
   };
   const handleEditCancel = () => {
     setEditMode(false);
     setEditName(customer.name);
     setEditEmail(customer.email || 'arun@example.com');
+    setEditPhone(customer.phone || '+94 77 123 4567');
+    setEditAddress(customer.address || '123 Main St, Jaffna');
   };
 
   // Notification preferences
@@ -94,17 +102,17 @@ export default function CustomerSettingsPage({ customer, onSignOut }) {
         <div>
           <label className="block text-sm font-medium">Phone Number</label>
           {editMode ? (
-            <input className="w-full p-2 border rounded" value={customer.phone || '+94 77 123 4567'} readOnly />
+            <input className="w-full p-2 border rounded" value={editPhone} onChange={e => setEditPhone(e.target.value)} />
           ) : (
-            <input className="w-full p-2 border rounded bg-gray-50" value={customer.phone || '+94 77 123 4567'} readOnly />
+            <input className="w-full p-2 border rounded bg-gray-50" value={editPhone} readOnly />
           )}
         </div>
         <div>
           <label className="block text-sm font-medium">Address</label>
           {editMode ? (
-            <input className="w-full p-2 border rounded" value={customer.address || '123 Main St, Jaffna'} readOnly />
+            <input className="w-full p-2 border rounded" value={editAddress} onChange={e => setEditAddress(e.target.value)} />
           ) : (
-            <input className="w-full p-2 border rounded bg-gray-50" value={customer.address || '123 Main St, Jaffna'} readOnly />
+            <input className="w-full p-2 border rounded bg-gray-50" value={editAddress} readOnly />
           )}
         </div>
         {editMode ? (

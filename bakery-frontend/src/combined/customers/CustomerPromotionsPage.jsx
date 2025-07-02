@@ -49,6 +49,10 @@ export default function CustomerPromotionsPage() {
           setUsedPromos(autoUsed);
           setUsedPromosState(autoUsed);
         }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch promotions, using default:', err);
+        setPromotions([defaultPromo]);
       });
   }, []);
 
@@ -58,13 +62,29 @@ export default function CustomerPromotionsPage() {
     console.log('usedPromos updated:', usedPromos);
   }, [usedPromos]);
 
-  const activePromos = promotions.filter(
-    p => isActive(p.expires) && !usedPromos.includes(p.code) && p.code !== defaultPromo.code
+  // Show only 'Bakery Anniversary' and unused promos in main grid
+  const bakeryAnniversaryPromo = promotions.find(
+    p => p.title && p.title.toLowerCase().includes('anniversary') && isActive(p.expires) && p.code !== defaultPromo.code
   );
-  const promosToShow = activePromos.length > 0 ? activePromos : [defaultPromo];
-  const usedPromoList = promotions.filter(
+  const unusedPromos = promotions.filter(
+    p => isActive(p.expires) && !usedPromos.includes(p.code) && p.code !== defaultPromo.code && (!p.title || !p.title.toLowerCase().includes('anniversary'))
+  );
+  const promosToShow = [];
+  if (bakeryAnniversaryPromo) promosToShow.push(bakeryAnniversaryPromo);
+  promosToShow.push(...unusedPromos);
+  if (promosToShow.length === 0) promosToShow.push(defaultPromo);
+  // Used promos (non-expired, not default)
+  let usedPromoList = promotions.filter(
     p => isActive(p.expires) && usedPromos.includes(p.code) && p.code !== defaultPromo.code
   );
+  // If only defaultPromo is present (backend down), check if it's used and show in used section
+  if (
+    promotions.length === 1 &&
+    promotions[0].id === 'default' &&
+    usedPromos.includes(defaultPromo.code)
+  ) {
+    usedPromoList = [defaultPromo];
+  }
 
   const handleCopy = (promo) => {
     navigator.clipboard.writeText(promo.code);
@@ -84,7 +104,7 @@ export default function CustomerPromotionsPage() {
       </h3>
       {/* Active Promotions Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {promosToShow.length > 0 && promosToShow[0].id !== 'default' ? promosToShow.map((promo, idx) => (
+        {promosToShow.length > 0 ? promosToShow.map((promo, idx) => (
           <Card
             key={promo._id || promo.id}
             className={`relative group shadow-2xl border-0 bg-gradient-to-br from-orange-100 via-amber-100 to-yellow-50 hover:from-orange-200 hover:to-amber-200 transition-all duration-300 rounded-3xl overflow-hidden animate-fade-in-up ${idx % 2 === 0 ? 'hover:scale-[1.04]' : 'hover:scale-[1.02]'}`}
