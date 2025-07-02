@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, AlertTriangle, Package } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
 
 export default function NotificationBell({ branch = 'all', customer }) {
@@ -10,12 +10,21 @@ export default function NotificationBell({ branch = 'all', customer }) {
   // Filter notifications by customer or branch
   let filteredNotifications = notifications;
   if (customer) {
-    filteredNotifications = notifications.filter(n => n.customer === customer);
-  } else if (branch !== 'all' && branch) {
-    filteredNotifications = notifications.filter(n => n.branch === branch);
+    filteredNotifications = notifications.filter(n => n.customer === customer && n.title === 'Order Confirmed');
+  } else if (branch === 'combined' || branch === 'all' || !branch) {
+    // Show all low stock and new order notifications for combined view
+    filteredNotifications = notifications.filter(n => n.title === 'Low Stock' || n.title === 'New Order');
+  } else if (branch) {
+    // Show only this branch's low stock and new order notifications
+    filteredNotifications = notifications.filter(n => n.branch === branch && (n.title === 'Low Stock' || n.title === 'New Order'));
   }
   console.log('NotificationBell: filteredNotifications:', filteredNotifications);
   const unreadCount = filteredNotifications.filter(n => !n.read).length;
+
+  // Determine dropdown title and empty message
+  const isCustomerBell = !!customer;
+  const dropdownTitle = isCustomerBell ? 'Order Notifications' : 'Notifications';
+  const emptyMessage = isCustomerBell ? 'No order notifications' : 'No notifications';
 
   return (
     <div className="relative">
@@ -34,17 +43,43 @@ export default function NotificationBell({ branch = 'all', customer }) {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <div className="p-3 border-b font-semibold text-bakery-brown">Notifications</div>
-          <ul className="max-h-80 overflow-y-auto">
+        <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="p-3 border-b font-semibold text-bakery-brown flex items-center gap-2">
+            {isCustomerBell ? <Bell className="w-5 h-5 text-orange-500" /> : <AlertTriangle className="w-5 h-5 text-red-500" />}
+            {dropdownTitle}
+          </div>
+          <ul className="max-h-80 overflow-y-auto p-4 space-y-3">
             {filteredNotifications.length === 0 ? (
-              <li className="p-4 text-center text-gray-500">No notifications</li>
+              <li className="p-4 text-center text-gray-500">{emptyMessage}</li>
             ) : (
               filteredNotifications.map(n => (
-                <li key={n.id} className={`p-3 border-b last:border-b-0 ${n.read ? 'bg-white' : 'bg-orange-50'}`}>
-                  <div className="font-medium">{n.title}</div>
-                  <div className="text-sm text-gray-600">{n.description}</div>
-                </li>
+                isCustomerBell ? (
+                  <li key={n.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-orange-900 text-base">{n.title}</span>
+                      <span className="text-gray-700 text-sm">{n.message || n.description}</span>
+                    </div>
+                  </li>
+                ) : (
+                  <li key={n.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
+                    <div className="flex items-center gap-3">
+                      {n.title === 'Low Stock' ? <Package className="w-6 h-6 text-orange-400" /> : <Bell className="w-6 h-6 text-orange-400" />}
+                      <span className="font-semibold text-orange-900 text-base">{n.item || n.title}</span>
+                      {branch === 'combined' && n.branch && (
+                        <span className={`ml-2 text-xs font-bold ${n.branch === 'jaffna' ? 'text-orange-600' : n.branch === 'colombo' ? 'text-blue-600' : 'text-gray-600'}`}>{n.branch.charAt(0).toUpperCase() + n.branch.slice(1)} Branch</span>
+                      )}
+                      {n.title === 'New Order' && n.orderBranch && branch === 'combined' && (
+                        <span className={`ml-2 text-xs font-bold ${n.orderBranch === 'jaffna' ? 'text-orange-600' : n.orderBranch === 'colombo' ? 'text-blue-600' : 'text-gray-600'}`}>({n.orderBranch.charAt(0).toUpperCase() + n.orderBranch.slice(1)})</span>
+                      )}
+                    </div>
+                    {n.stock && (
+                      <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full">Stock: {n.stock}</span>
+                    )}
+                    {n.title === 'New Order' && (
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">{n.message}</span>
+                    )}
+                  </li>
+                )
               ))
             )}
           </ul>

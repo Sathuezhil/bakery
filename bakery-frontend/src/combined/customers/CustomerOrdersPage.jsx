@@ -162,8 +162,16 @@ export default function CustomerOrdersPage({ customer, branch }) {
                       clearCart();
                       addNotification({
                         title: 'New Order',
+                        branch: 'combined',
+                        message: 'A new order has been placed.',
+                        orderBranch: branch,
+                        customer: customer?.email || customer?.id || customer?.name
+                      });
+                      addNotification({
+                        title: 'New Order',
                         branch: branch,
-                        message: 'A new order has been placed.'
+                        message: 'A new order has been placed.',
+                        customer: customer?.email || customer?.id || customer?.name
                       });
                     }}
                   >
@@ -206,8 +214,16 @@ export default function CustomerOrdersPage({ customer, branch }) {
                       clearCart();
                       addNotification({
                         title: 'New Order',
+                        branch: 'combined',
+                        message: 'A new order has been placed.',
+                        orderBranch: branch,
+                        customer: customer?.email || customer?.id || customer?.name
+                      });
+                      addNotification({
+                        title: 'New Order',
                         branch: branch,
-                        message: 'A new order has been placed.'
+                        message: 'A new order has been placed.',
+                        customer: customer?.email || customer?.id || customer?.name
                       });
                     }}
                   >

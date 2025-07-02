@@ -6,10 +6,13 @@ export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
 
   const addNotification = (notification) => {
-    setNotifications(prev => [
-      { ...notification, id: Date.now() + Math.random(), read: false },
-      ...prev
-    ]);
+    setNotifications(prev => {
+      const newNotif = { ...notification, id: notification.id || (Date.now() + Math.random()), read: false };
+      const updated = [newNotif, ...prev.filter(n => n.id !== newNotif.id)];
+      console.log('addNotification:', newNotif);
+      console.log('notifications after add:', updated);
+      return updated;
+    });
   };
 
   const markAllAsRead = () => {
@@ -17,7 +20,12 @@ export function NotificationProvider({ children }) {
   };
 
   const removeNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications(prev => {
+      const updated = prev.filter(n => n.id !== id);
+      console.log('removeNotification:', id);
+      console.log('notifications after remove:', updated);
+      return updated;
+    });
   };
 
   return (

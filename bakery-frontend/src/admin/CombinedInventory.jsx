@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, Package, TrendingDown, Eye, Edit, Minus, Plus } from 'lucide-react';
+import { useNotifications } from '../context/NotificationContext';
 
 // Jaffna inventory data
 const jaffnaInventory = [
@@ -36,6 +37,7 @@ const colomboInventory = [
 const combinedInventory = [...jaffnaInventory, ...colomboInventory];
 
 export default function CombinedInventory() {
+  const { addNotification, removeNotification } = useNotifications();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [selectedItem, setSelectedItem] = useState(null);
@@ -81,7 +83,7 @@ export default function CombinedInventory() {
   };
 
   const handleStockChange = (itemId, amount) => {
-    setInventory(inventory.map(item => {
+    const updatedInventory = inventory.map(item => {
       if (item.id === itemId) {
         const newStock = Math.max(0, (item.currentStock ?? item.stock) + amount);
         let status = item.status;
@@ -94,7 +96,8 @@ export default function CombinedInventory() {
         return { ...item, currentStock: newStock, stock: newStock, status };
       }
       return item;
-    }));
+    });
+    setInventory(updatedInventory);
   };
 
   return (

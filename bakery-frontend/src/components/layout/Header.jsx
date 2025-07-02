@@ -7,7 +7,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import NotificationBell from './NotificationBell';
 
-export default function Header({ setSidebarOpen, user, onLogout }) {
+export default function Header({ setSidebarOpen, user, onLogout, activeBranch }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLowStock, setShowLowStock] = useState(false);
   // Remove order modal state and effect
@@ -59,42 +59,10 @@ export default function Header({ setSidebarOpen, user, onLogout }) {
         </div>
         {/* Right side */}
         <div className="flex items-center space-x-6">
-          {/* Notification Bell (Low Stock) */}
-          <div className="relative">
-            <button onClick={() => setShowLowStock(true)} className="focus:outline-none">
-              <Bell className="w-6 h-6 text-orange-500" />
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold border-2 border-white">{lowStockProducts.length}</span>
-            </button>
+          {/* Notification Bell */}
+          <div className="flex items-center gap-2">
+            <NotificationBell branch={activeBranch} />
           </div>
-          {/* Low Stock Dialog */}
-          <Dialog open={showLowStock} onOpenChange={setShowLowStock}>
-            <DialogContent className="max-w-md">
-              <DialogHeader className="flex flex-row items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                <DialogTitle className="text-lg">Low Stock Products</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4 max-h-72 overflow-y-auto">
-                {lowStockProducts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <CheckCircle className="w-10 h-10 text-green-500 mb-2" />
-                    <span className="text-green-700 font-semibold">All stocks are healthy!</span>
-                  </div>
-                ) : (
-                  <ul className="space-y-3">
-                    {lowStockProducts.map((item, idx) => (
-                      <li key={idx} className="flex items-center justify-between p-4 bg-white rounded-lg shadow border border-orange-100 hover:shadow-md transition">
-                        <div className="flex items-center gap-3">
-                          <Package className="w-6 h-6 text-orange-400" />
-                          <span className="font-semibold text-orange-900 text-base">{item.name}</span>
-                        </div>
-                        <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full">Stock: {item.stock}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
           {/* User Info */}
           <div className="flex flex-col items-end mr-2">
             <span className="text-sm font-semibold text-gray-800">admin</span>

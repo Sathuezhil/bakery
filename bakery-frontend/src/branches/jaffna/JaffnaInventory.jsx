@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Minus
 } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationContext';
 
 const categories = ['Ingredients', 'Packaging', 'Equipment', 'Supplies'];
 
@@ -131,6 +132,7 @@ const initialInventory = [
 ];
 
 export default function JaffnaInventory() {
+  const { addNotification, removeNotification } = useNotifications();
   const [inventory, setInventory] = useState(initialInventory);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -197,6 +199,7 @@ export default function JaffnaInventory() {
     };
     
     setInventory([...inventory, itemToAdd]);
+    syncLowStockNotifications([...inventory, itemToAdd]);
     resetForm();
   };
 
@@ -230,6 +233,7 @@ export default function JaffnaInventory() {
     };
     
     setInventory(inventory.map(item => item.id === editingItem.id ? updatedItem : item));
+    syncLowStockNotifications(inventory.map(item => item.id === editingItem.id ? updatedItem : item));
     resetForm();
   };
 
@@ -266,6 +270,34 @@ export default function JaffnaInventory() {
       }
       return item;
     }));
+    syncLowStockNotifications(inventory.map(item => {
+      if (item.id === itemId) {
+        const newStock = Math.max(0, item.currentStock + amount);
+        const status = determineStatus(newStock, item.minimumStock);
+        return { ...item, currentStock: newStock, status };
+      }
+      return item;
+    }));
+  };
+
+  const syncLowStockNotifications = (updatedInventory) => {
+    console.log('syncLowStockNotifications called with inventory:', updatedInventory);
+    updatedInventory.forEach(item => {
+      const notifId = `lowstock-jaffna-${item.name}`;
+      if (item.status === 'low' || item.status === 'critical') {
+        console.log('Adding low stock notification for:', item.name);
+        addNotification({
+          id: notifId,
+          title: 'Low Stock',
+          branch: 'jaffna',
+          description: `${item.name} is low in stock!`,
+          item: item.name
+        });
+      } else {
+        console.log('Removing low stock notification for:', item.name);
+        removeNotification(notifId);
+      }
+    });
   };
 
   return (

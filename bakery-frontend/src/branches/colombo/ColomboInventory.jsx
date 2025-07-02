@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Search, Edit, AlertTriangle, Package, TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationContext';
 
 const categories = ['Ingredients', 'Packaging', 'Equipment', 'Supplies'];
 
@@ -120,6 +121,7 @@ const initialInventory = [
 ];
 
 export default function ColomboInventory() {
+  const { addNotification, removeNotification } = useNotifications();
   const [inventory, setInventory] = useState(initialInventory);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -186,6 +188,7 @@ export default function ColomboInventory() {
     };
     
     setInventory([...inventory, itemToAdd]);
+    syncLowStockNotifications([...inventory, itemToAdd]);
     resetForm();
   };
 
@@ -219,6 +222,7 @@ export default function ColomboInventory() {
     };
     
     setInventory(inventory.map(item => item.id === editingItem.id ? updatedItem : item));
+    syncLowStockNotifications(inventory.map(item => item.id === editingItem.id ? updatedItem : item));
     resetForm();
   };
 
@@ -255,6 +259,31 @@ export default function ColomboInventory() {
       }
       return item;
     }));
+    syncLowStockNotifications(inventory.map(item => {
+      if (item.id === itemId) {
+        const newStock = Math.max(0, item.currentStock + amount);
+        const status = determineStatus(newStock, item.minimumStock);
+        return { ...item, currentStock: newStock, status };
+      }
+      return item;
+    }));
+  };
+
+  const syncLowStockNotifications = (updatedInventory) => {
+    updatedInventory.forEach(item => {
+      const notifId = `lowstock-colombo-${item.name}`;
+      if (item.status === 'low' || item.status === 'critical') {
+        addNotification({
+          id: notifId,
+          title: 'Low Stock',
+          branch: 'colombo',
+          description: `${item.name} is low in stock!`,
+          item: item.name
+        });
+      } else {
+        removeNotification(notifId);
+      }
+    });
   };
 
   return (
