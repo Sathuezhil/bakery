@@ -84,7 +84,7 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
       </div>
       {/* Quick Actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <button onClick={() => setActiveTab && setActiveTab('orders')} className="flex-1 flex items-center justify-center gap-2 bg-orange-50 text-orange-700 font-semibold py-4 rounded-2xl shadow hover:bg-orange-100 transition text-lg"><ShoppingBag className="w-6 h-6" />Order Again</button>
+        <button onClick={() => setActiveTab && setActiveTab('products')} className="flex-1 flex items-center justify-center gap-2 bg-orange-50 text-orange-700 font-semibold py-4 rounded-2xl shadow hover:bg-orange-100 transition text-lg"><ShoppingBag className="w-6 h-6" />Order Again</button>
         <button onClick={() => setActiveTab && setActiveTab('orders')} className="flex-1 flex items-center justify-center gap-2 bg-orange-50 text-orange-700 font-semibold py-4 rounded-2xl shadow hover:bg-orange-100 transition text-lg"><Clock className="w-6 h-6" />View All Orders</button>
         <button onClick={() => setActiveTab && setActiveTab('settings')} className="flex-1 flex items-center justify-center gap-2 bg-orange-50 text-orange-700 font-semibold py-4 rounded-2xl shadow hover:bg-orange-100 transition text-lg"><Phone className="w-6 h-6" />Contact Support</button>
       </div>
