@@ -22,6 +22,18 @@ function getPromoIcon(title) {
   return <Gift className="w-7 h-7" />;
 }
 
+function getPromoIconSmall(title) {
+  if (title.toLowerCase().includes('cake')) return <Gift className="w-4 h-4" />;
+  if (title.toLowerCase().includes('bun')) return <ShoppingBag className="w-4 h-4" />;
+  return <Gift className="w-4 h-4" />;
+}
+
+function getPromoIconMedium(title) {
+  if (title.toLowerCase().includes('cake')) return <Gift className="w-6 h-6" />;
+  if (title.toLowerCase().includes('bun')) return <ShoppingBag className="w-6 h-6" />;
+  return <Gift className="w-6 h-6" />;
+}
+
 function getUsedPromos() {
   try {
     return JSON.parse(localStorage.getItem('usedPromos') || '[]');
@@ -71,13 +83,27 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
         </div>
       </div>
       {/* Promotions Carousel */}
-      <div className="mb-8 overflow-x-auto flex gap-6 pb-2 hide-scrollbar">
+      <div className="mb-7 overflow-x-auto flex gap-5 pb-3 hide-scrollbar">
         {promos.map((promo) => (
-          <div key={promo._id || promo.id} className="min-w-[240px] bg-gradient-to-br from-orange-400 to-amber-300 text-white rounded-2xl shadow-xl p-5 flex items-center gap-4 hover:scale-105 transition-transform duration-200">
-            <div className="bg-white/30 rounded-full p-3 flex items-center justify-center">{getPromoIcon(promo.title)}</div>
-            <div>
-              <div className="font-bold text-lg">{promo.title}</div>
-              <div className="text-sm opacity-90">{promo.description || promo.desc}</div>
+          <div
+            key={promo._id || promo.id}
+            className="relative min-w-[265px] bg-gradient-to-br from-orange-400 to-amber-300 text-white rounded-2xl shadow-xl p-5 flex items-center gap-5 border-2 border-orange-200 hover:border-amber-400 hover:shadow-[0_0_20px_3px_rgba(255,191,71,0.22)] transition-all duration-300 group overflow-hidden"
+            style={{ boxShadow: '0 0 16px 0 rgba(255,191,71,0.13), 0 3px 16px 0 rgba(255,140,0,0.09)' }}
+          >
+            {/* NEW badge */}
+            <span className="absolute top-2.5 left-2.5 bg-white text-orange-500 font-bold text-[12px] px-2.5 py-1 rounded-full shadow z-10 animate-pulse">NEW</span>
+            {/* Decorative SVG confetti */}
+            <svg className="absolute right-0 bottom-0 opacity-20 w-14 h-14 pointer-events-none" viewBox="0 0 100 100"><circle cx="20" cy="20" r="6" fill="#fff" /><circle cx="80" cy="40" r="4" fill="#fff" /><circle cx="60" cy="80" r="3" fill="#fff" /></svg>
+            <div className="bg-white/30 rounded-full p-3 flex items-center justify-center shadow group-hover:scale-110 transition-transform duration-300">{getPromoIconMedium(promo.title)}</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="font-extrabold text-lg md:text-xl">{promo.title}</div>
+                {/* visually distinct expiry */}
+                <span className="ml-1.5 bg-white/80 text-orange-500 font-semibold text-[12px] px-2 py-0.5 rounded-full border border-orange-200 shadow-sm">{promo.expires?.slice(5, 10)}</span>
+              </div>
+              <div className="text-sm md:text-base opacity-90 font-medium mb-2">{promo.description || promo.desc}</div>
+              {/* Copy Code button */}
+              <PromoCodeButtonMedium code={promo.code} />
             </div>
           </div>
         ))}
@@ -136,5 +162,74 @@ export default function CustomerDashboardPage({ customer, activeCustomerBranch, 
         </ul>
       </div>
     </div>
+  );
+}
+
+function PromoCodeButton({ code }) {
+  const [copied, setCopied] = useState(false);
+  if (!code) return null;
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+      }}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-orange-600 bg-white shadow hover:bg-orange-100 border-2 border-orange-200 transition-all duration-200 ${copied ? 'ring-2 ring-amber-400' : ''}`}
+      title="Copy promo code"
+    >
+      <span>{code}</span>
+      {copied ? (
+        <span className="text-green-500 font-semibold">Copied!</span>
+      ) : (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      )}
+    </button>
+  );
+}
+
+function PromoCodeButtonSmall({ code }) {
+  const [copied, setCopied] = useState(false);
+  if (!code) return null;
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1000);
+      }}
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-bold text-orange-600 bg-white shadow hover:bg-orange-100 border border-orange-200 transition-all duration-200 text-xs ${copied ? 'ring-1 ring-amber-400' : ''}`}
+      title="Copy promo code"
+    >
+      <span>{code}</span>
+      {copied ? (
+        <span className="text-green-500 font-semibold">✓</span>
+      ) : (
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      )}
+    </button>
+  );
+}
+
+function PromoCodeButtonMedium({ code }) {
+  const [copied, setCopied] = useState(false);
+  if (!code) return null;
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+      }}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-orange-600 bg-white shadow hover:bg-orange-100 border border-orange-200 transition-all duration-200 text-sm ${copied ? 'ring-1 ring-amber-400' : ''}`}
+      title="Copy promo code"
+    >
+      <span>{code}</span>
+      {copied ? (
+        <span className="text-green-500 font-semibold">✓</span>
+      ) : (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      )}
+    </button>
   );
 } 
