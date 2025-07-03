@@ -39,57 +39,66 @@ export default function CustomerOrdersPage({ customer, branch }) {
 
   return (
     <div>
+      <style>{`
+        body.pdf-mode .no-pdf { display: none !important; }
+      `}</style>
       <h3 className="text-xl font-bold mb-4">Your Orders</h3>
       <ul className="space-y-4">
         {/* Show payment success and bill even if cart is empty */}
         {paymentSuccess && (
-          <div className="bill-section p-6 bg-white rounded-xl border-2 border-green-400 shadow-lg max-w-lg mx-auto" ref={billRef} id="bill-section">
-            {/* Bakery Branding */}
-            <div className="flex flex-col items-center mb-4">
-              <div className="text-2xl font-extrabold text-orange-700 tracking-wide mb-1">Sweet Dreams Bakery</div>
-              <div className="text-sm text-gray-700">123 Main Street, Colombo, Sri Lanka</div>
-              <div className="text-sm text-gray-700 mb-1">Phone: +94 77 123 4567</div>
-              <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-full mb-2"></div>
-            </div>
-            <div className="text-lg font-bold text-green-700 mb-2 text-center">Payment Successful!</div>
-            <div className="mb-2 text-center">Thank you for your order. Here is your bill:</div>
-            <table className="w-full text-sm text-gray-700 border border-green-200 rounded mb-3">
-              <thead>
-                <tr className="bg-green-100">
-                  <th className="px-3 py-2 text-left">Product</th>
-                  <th className="px-3 py-2 text-right">Qty</th>
-                  <th className="px-3 py-2 text-right">Price</th>
-                  <th className="px-3 py-2 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lastPaidCart.map(item => (
-                  <tr key={item.id || item._id}>
-                    <td className="px-3 py-2">{item.name}</td>
-                    <td className="px-3 py-2 text-right">{item.quantity}</td>
-                    <td className="px-3 py-2 text-right">Rs.{item.price}</td>
-                    <td className="px-3 py-2 text-right">Rs.{item.price * item.quantity}</td>
+          <>
+            <div className="bill-section p-6 bg-white rounded-xl border-2 border-green-400 shadow-lg max-w-lg mx-auto" id="bill-section">
+              {/* Bakery Branding */}
+              <div className="flex flex-col items-center mb-4">
+                <div className="text-2xl font-extrabold text-orange-700 tracking-wide mb-1">Sweet Dreams Bakery</div>
+                <div className="text-sm text-gray-700">123 Main Street, Colombo, Sri Lanka</div>
+                <div className="text-sm text-gray-700 mb-1">Phone: +94 77 123 4567</div>
+                <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-full mb-2"></div>
+              </div>
+              <div className="text-lg font-bold text-green-700 mb-2 text-center">Payment Successful!</div>
+              <div className="mb-2 text-center">Thank you for your order. Here is your bill:</div>
+              <table className="w-full text-sm text-gray-700 border border-green-200 rounded mb-3">
+                <thead>
+                  <tr className="bg-green-100">
+                    <th className="px-3 py-2 text-left">Product</th>
+                    <th className="px-3 py-2 text-right">Qty</th>
+                    <th className="px-3 py-2 text-right">Price</th>
+                    <th className="px-3 py-2 text-right">Subtotal</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="flex justify-between items-center mt-2 mb-1">
-              <span className="font-semibold text-lg text-green-800">Total Paid:</span>
-              <span className="font-bold text-lg text-green-900">Rs.{lastPaidTotal}</span>
+                </thead>
+                <tbody>
+                  {lastPaidCart.map(item => (
+                    <tr key={item.id || item._id}>
+                      <td className="px-3 py-2">{item.name}</td>
+                      <td className="px-3 py-2 text-right">{item.quantity}</td>
+                      <td className="px-3 py-2 text-right">Rs.{item.price}</td>
+                      <td className="px-3 py-2 text-right">Rs.{item.price * item.quantity}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="flex justify-between items-center mt-2 mb-1">
+                <span className="font-semibold text-lg text-green-800">Total Paid:</span>
+                <span className="font-bold text-lg text-green-900">Rs.{lastPaidTotal}</span>
+              </div>
+              <div className="text-sm text-gray-700 mb-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
             </div>
-            <div className="text-sm text-gray-700 mb-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
+            {/* Download Bill button is OUTSIDE bill-section, so it will NOT appear in the PDF */}
             <button
-              className="mt-3 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold w-full"
+              className="mt-3 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-medium w-auto no-pdf text-base"
               onClick={() => {
                 const element = document.getElementById('bill-section');
                 if (element) {
-                  html2pdf().from(element).save();
+                  document.body.classList.add('pdf-mode');
+                  html2pdf().from(element).save().then(() => {
+                    document.body.classList.remove('pdf-mode');
+                  });
                 }
               }}
             >
               Download Bill
             </button>
-          </div>
+          </>
         )}
         {/* Show cart as a pending order if cart is not empty and payment not done */}
         {cart.length > 0 && !paymentSuccess && (
