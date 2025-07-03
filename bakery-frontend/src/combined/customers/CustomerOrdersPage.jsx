@@ -2,6 +2,7 @@ import { useCart } from "@/context/CartContext";
 import { useState, useRef } from 'react';
 import { useOrders } from '../../context/OrdersContext';
 import { useNotifications } from '../../context/NotificationContext';
+import html2pdf from 'html2pdf.js';
 
 const mockOrders = [
   { id: 1, date: '2024-06-01', items: 3, total: 1400, status: 'Delivered' },
@@ -42,40 +43,53 @@ export default function CustomerOrdersPage({ customer, branch }) {
       <ul className="space-y-4">
         {/* Show payment success and bill even if cart is empty */}
         {paymentSuccess && (
-          <li className="bill-section p-4 bg-green-50 rounded border border-green-300 max-w-md mx-auto" ref={billRef}>
-            <div className="text-lg font-bold text-green-700 mb-2">Payment Successful!</div>
-            <div className="mb-2">Thank you for your order. Here is your bill:</div>
-            <table className="min-w-full text-sm text-gray-700 border border-green-200 rounded mb-2">
+          <div className="bill-section p-6 bg-white rounded-xl border-2 border-green-400 shadow-lg max-w-lg mx-auto" ref={billRef} id="bill-section">
+            {/* Bakery Branding */}
+            <div className="flex flex-col items-center mb-4">
+              <div className="text-2xl font-extrabold text-orange-700 tracking-wide mb-1">Sweet Dreams Bakery</div>
+              <div className="text-sm text-gray-700">123 Main Street, Colombo, Sri Lanka</div>
+              <div className="text-sm text-gray-700 mb-1">Phone: +94 77 123 4567</div>
+              <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-full mb-2"></div>
+            </div>
+            <div className="text-lg font-bold text-green-700 mb-2 text-center">Payment Successful!</div>
+            <div className="mb-2 text-center">Thank you for your order. Here is your bill:</div>
+            <table className="w-full text-sm text-gray-700 border border-green-200 rounded mb-3">
               <thead>
                 <tr className="bg-green-100">
-                  <th className="px-2 py-1 text-left">Product</th>
-                  <th className="px-2 py-1 text-right">Qty</th>
-                  <th className="px-2 py-1 text-right">Price</th>
-                  <th className="px-2 py-1 text-right">Subtotal</th>
+                  <th className="px-3 py-2 text-left">Product</th>
+                  <th className="px-3 py-2 text-right">Qty</th>
+                  <th className="px-3 py-2 text-right">Price</th>
+                  <th className="px-3 py-2 text-right">Subtotal</th>
                 </tr>
               </thead>
               <tbody>
                 {lastPaidCart.map(item => (
                   <tr key={item.id || item._id}>
-                    <td className="px-2 py-1">{item.name}</td>
-                    <td className="px-2 py-1 text-right">{item.quantity}</td>
-                    <td className="px-2 py-1 text-right">Rs.{item.price}</td>
-                    <td className="px-2 py-1 text-right">Rs.{item.price * item.quantity}</td>
+                    <td className="px-3 py-2">{item.name}</td>
+                    <td className="px-3 py-2 text-right">{item.quantity}</td>
+                    <td className="px-3 py-2 text-right">Rs.{item.price}</td>
+                    <td className="px-3 py-2 text-right">Rs.{item.price * item.quantity}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="font-semibold">Total Paid: Rs.{lastPaidTotal}</div>
-            <div className="text-sm text-gray-700 mt-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
+            <div className="flex justify-between items-center mt-2 mb-1">
+              <span className="font-semibold text-lg text-green-800">Total Paid:</span>
+              <span className="font-bold text-lg text-green-900">Rs.{lastPaidTotal}</span>
+            </div>
+            <div className="text-sm text-gray-700 mb-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
             <button
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-semibold"
+              className="mt-3 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold w-full"
               onClick={() => {
-                window.print();
+                const element = document.getElementById('bill-section');
+                if (element) {
+                  html2pdf().from(element).save();
+                }
               }}
             >
               Download Bill
             </button>
-          </li>
+          </div>
         )}
         {/* Show cart as a pending order if cart is not empty and payment not done */}
         {cart.length > 0 && !paymentSuccess && (
