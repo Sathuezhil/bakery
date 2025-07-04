@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Star, Edit, Trash2 } from 'lucide-react';
 
 const categories = ['Bread', 'Cakes', 'Pastries', 'Cookies', 'Seasonal'];
 
@@ -23,7 +23,8 @@ export default function ProductsPage() {
     price: '',
     stock: '',
     description: '',
-    image: ''
+    image: '',
+    rating: 0
   });
 
   // Fetch products from backend on mount
@@ -35,7 +36,7 @@ export default function ProductsPage() {
 
   // Filter only Colombo branch products
   const filteredProducts = products.filter(product => {
-    const matchesBranch = product.branch?.toLowerCase() === "colombo";
+    const matchesBranch = Array.isArray(product.branches) && product.branches.some(b => b && b.toLowerCase() === "colombo")
     const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
@@ -57,35 +58,35 @@ export default function ProductsPage() {
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
       status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
-      rating: 0,
+      rating: newProduct.rating ? parseFloat(newProduct.rating) : 0, // <-- Use the value from the form
       sales: 0,
-      branch: "Colombo"
+      branches: ["Jaffna", "Colombo"] 
     };
-    try {
-      const response = await fetch('http://localhost:5000/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productToAdd)
-      });
-      if (!response.ok) throw new Error('Failed to add product');
-      // Fetch latest products from backend after adding
-      const productsRes = await fetch('http://localhost:5000/api/products');
-      const allProducts = await productsRes.json();
-      setProducts(allProducts);
-      alert('Product added successfully!');
-    } catch (error) {
-      alert('Error adding product: ' + error.message);
-    }
-    setNewProduct({
-      name: '',
-      category: '',
-      price: '',
-      stock: '',
-      description: '',
-      image: ''
+  try {
+    const response = await fetch('http://localhost:5000/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productToAdd)
     });
-    setIsAddModalOpen(false);
-  };
+    if (!response.ok) throw new Error('Failed to add product');
+    const savedProduct = await response.json();
+    setProducts([...products, ...savedProduct.added]);
+    alert('Product added successfully!');
+  } catch (error) {
+    alert('Error adding product: ' + error.message);
+  }
+  setNewProduct({
+    name: '',
+    category: '',
+    price: '',
+    stock: '',
+    description: '',
+    image: '',
+    rating: ''
+  });
+  setIsAddModalOpen(false);
+};
+
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -95,7 +96,8 @@ export default function ProductsPage() {
       price: product.price.toString(),
       stock: product.stock.toString(),
       description: product.description,
-      image: product.image
+      image: product.image,
+      rating: product.rating
     });
     setIsAddModalOpen(true);
   };
@@ -131,7 +133,8 @@ export default function ProductsPage() {
       price: '',
       stock: '',
       description: '',
-      image: ''
+      image: '',
+      rating: 0
     });
     setIsAddModalOpen(false);
   };
@@ -230,6 +233,32 @@ export default function ProductsPage() {
                 </div>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={newProduct.status} onValueChange={value => setNewProduct({ ...newProduct, status: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="low-stock">Low Stock</SelectItem>
+                    <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rating">Rating</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={newProduct.rating}
+                  onChange={e => setNewProduct({ ...newProduct, rating: e.target.value })}
+                  placeholder="e.g., 4.5"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -249,7 +278,8 @@ export default function ProductsPage() {
                     price: '',
                     stock: '',
                     description: '',
-                    image: ''
+                    image: '',
+                    rating: 0
                   });
                 }}>
                   Cancel
@@ -293,34 +323,48 @@ export default function ProductsPage() {
         </CardContent>
       </Card>
       {/* Product List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map(product => (
-          <Card key={product._id || product.id} className="bakery-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-semibold text-bakery-brown flex items-center">
-                {product.name}
-                {product.status && (
-                  <span className={`ml-2 px-2 py-1 rounded text-xs font-bold border ${getStatusColor(product.status)}`}>{product.status}</span>
-                )}
-              </CardTitle>
-              <Badge>{product.category}</Badge>
-            </CardHeader>
-            <CardContent>
-              <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded mb-4" />
-              <div className="mb-2 text-bakery-brown font-bold">LKR {product.price}</div>
-              <div className="mb-2 text-sm text-muted-foreground">{product.description}</div>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-xs">Stock: {product.stock}</span>
-                <span className="text-xs">Sold: {product.sales}</span>
-                <span className="text-xs">Rating: {product.rating}</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filteredProducts.map((product) => (
+          <Card key={product.id} className="bakery-card group overflow-hidden">
+            <CardContent className="p-0">
+              <div className="relative">
+                <img
+                  src={product.image && product.image.trim() !== '' ? product.image : 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=400'}
+                  alt={product.name}
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <Badge className={`absolute top-2 right-2 text-xs ${getStatusColor(product.status)}`}>
+                  {(product.status || '').replace('-', ' ')}
+                </Badge>
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                  <p className="text-2xl font-bold text-white">
+                    LKR {product.price ? Number(product.price).toFixed(2) : '0.00'}
+                  </p>
+                </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-4">
-                <Button size="sm" variant="outline" onClick={() => handleEditProduct(product)}>
-                  Edit
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDeleteProduct(product._id || product.id)}>
-                  Delete
-                </Button>
+              <div className="p-4">
+                <CardTitle className="text-lg font-semibold text-bakery-brown mb-2 truncate">{product.name}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                <div className="flex items-center justify-between text-sm mt-4">
+                  <div className="flex items-center gap-1 text-amber-500">
+                    <Star className="w-4 h-4" />
+                    <span className="font-medium">{product.rating ? Number(product.rating).toFixed(1) : 'N/A'}</span>
+                  </div>
+                  <div className="text-muted-foreground">{product.sales !== undefined ? product.sales : 0} sold</div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Edit className="w-4 h-4" /> Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => handleDeleteProduct(product.id)}
+                  >
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

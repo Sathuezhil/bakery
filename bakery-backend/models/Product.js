@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema({
   stock: Number,
   description: String,
   image: String,
-  branch: String, // 'Colombo' or 'Jaffna'
+  branches: [String], // Array of branches (e.g., ['Jaffna', 'Colombo'])
   status: String,
   rating: Number,
   sales: Number

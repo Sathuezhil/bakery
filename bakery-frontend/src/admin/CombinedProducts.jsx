@@ -250,10 +250,19 @@ const initialProducts = [
 ];
 
 const categories = ['Bread', 'Pastries', 'Cakes', 'Cookies', 'Tart', 'Bun', 'Snacks', 'Seasonal'];
-const branches = ['Jaffna', 'Colombo'];
+const branches = ['Jaffna', 'Colombo','Both'];
 
 export default function CombinedProducts() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]); // Remove initialProducts
+  const dedupedProducts = [];
+const seen = new Set();
+products.forEach(product => {
+  const key = `${product.name?.toLowerCase()}-${product.category?.toLowerCase()}`;
+  if (!seen.has(key)) {
+    dedupedProducts.push(product);
+    seen.add(key);
+  }
+});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBranch, setSelectedBranch] = useState('all');
@@ -272,6 +281,7 @@ export default function CombinedProducts() {
       .then(res => res.json())
       .then(data => setProducts(data));
   }, []);
+  
   const [editingProduct, setEditingProduct] = useState(null);
 // Load products from localStorage on mount
 useEffect(() => {
@@ -289,15 +299,15 @@ useEffect(() => {
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-                         const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesBranch = selectedBranch === 'all' || product.branch === selectedBranch;
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesBranch = selectedBranch === 'all' || (Array.isArray(product.branches) && product.branches.includes(selectedBranch));
     return matchesSearch && matchesCategory && matchesBranch;
   });
 
   // Get branch statistics
   const branchStats = {
-    jaffna: products.filter(p => p.branch === 'Jaffna').length,
-    colombo: products.filter(p => p.branch === 'Colombo').length,
+    jaffna: products.filter(p => Array.isArray(p.branches) && p.branches.includes('Jaffna')).length,
+    colombo: products.filter(p => Array.isArray(p.branches) && p.branches.includes('Colombo')).length,
     total: products.length
   };
 
@@ -307,38 +317,45 @@ useEffect(() => {
     return acc;
   }, {});
 
+  // ... existing code ...
   const handleAddProduct = async () => {
     const productToAdd = {
       ...newProduct,
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
-      status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
-      rating: 0,
+      rating: newProduct.rating ? parseFloat(newProduct.rating) : 0,
+      status: newProduct.status || (parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock'),
       sales: 0,
-      branch: "Jaffna" // ADD THIS LINE
+      branches: ["Jaffna", "Colombo"]
     };
+    delete productToAdd.branch; // backend confusion avoid panna
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productToAdd)
+        body: JSON.stringify(productToAdd),
       });
-      if (!response.ok) throw new Error('Failed to add product');
-      const savedProduct = await response.json();
-      setProducts([...products, ...savedProduct.added]);
-      alert('Product added successfully!');
-    } catch (error) {
-      alert('Error adding product: ' + error.message);
+      if (res.ok) {
+        // Refresh products
+        fetch('http://localhost:5000/api/products')
+          .then(res => res.json())
+          .then(data => setProducts(data));
+        setIsAddDialogOpen(false);
+        setNewProduct({
+          name: '',
+          price: '',
+          category: '',
+          branch: '',
+          stock: '',
+          description: '',
+          image: ''
+        });
+      } else {
+        alert('Failed to add product');
+      }
+    } catch (err) {
+      alert('Error adding product');
     }
-    setNewProduct({
-      name: '',
-      category: '',
-      price: '',
-      stock: '',
-      description: '',
-      image: ''
-    });
-    setIsAddModalOpen(false);
   };
 
   const handleEditProduct = (product) => {
@@ -626,6 +643,32 @@ useEffect(() => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="rating">Rating</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={newProduct.rating}
+                  onChange={e => setNewProduct({ ...newProduct, rating: e.target.value })}
+                  placeholder="e.g., 4.5"
+                />
+              </div>
+              <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={newProduct.status} onValueChange={value => setNewProduct({ ...newProduct, status: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="low-stock">Low Stock</SelectItem>
+                  <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+              <div className="space-y-2">
                 <Label htmlFor="image">Image URL (optional)</Label>
                 <Input
                   id="image"
@@ -648,21 +691,22 @@ useEffect(() => {
       </div>
 
       {/* Products Grid */}
+   
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="bakery-card group overflow-hidden">
+        {filteredProducts.map((product, idx) => (
+         <Card key={product._id || product.id || (product.name ? product.name : idx)}>
             <CardContent className="p-0">
               <div className="relative">
                 <img
                   src={product.image && product.image.trim() !== '' ? product.image : 'https://images.pexels.com/photos/1070945/pexels-photo-1070945.jpeg?auto=compress&cs=tinysrgb&w=400'}
-                  alt={product.name}
+                  alt={product.name || 'Product'}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <Badge className={`absolute top-2 right-2 text-xs ${getStatusColor(product.status)}`}>
-                  {product.status.replace('-', ' ')}
+                  {(product.status || '').replace('-', ' ')}
                 </Badge>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                  <p className="text-2xl font-bold text-white">LKR {product.price.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white">LKR {product.price ? Number(product.price).toFixed(2) : '0.00'}</p>
                 </div>
               </div>
               <div className="p-4">
@@ -676,23 +720,30 @@ useEffect(() => {
                   <div className="text-muted-foreground">{product.sales} sold</div>
                 </div>
                 <div className="flex gap-2 mt-4">
-  <Button variant="outline" size="sm" className="flex items-center gap-1">
-    <Edit className="w-4 h-4" /> Edit
-  </Button>
-  <Button
-     variant="destructive"
-     size="sm"
-     className="flex items-center gap-1"
-     onClick={() => handleDeleteProduct(product.id)}
-   >
-     <Trash2 className="w-4 h-4" /> Delete
-   </Button>
-</div>
+                <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      type="button"
+                    >
+                      <Edit className="w-4 h-4" /> Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      type="button"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </Button>
+               </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
 
       {/* Empty State */}
       {filteredProducts.length === 0 && (

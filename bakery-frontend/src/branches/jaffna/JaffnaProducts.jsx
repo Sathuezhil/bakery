@@ -180,10 +180,11 @@ export default function ProductsPage() {
       .then(data => setProducts(data));
   }, []);
   const filteredProducts = products.filter(product => {
+    const matchesBranch = Array.isArray(product.branches) &&   product.branches.some(b => b && b.toLowerCase() === "jaffna")
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesBranch && matchesSearch && matchesCategory;
   });
 
   const getStatusColor = (status) => {
@@ -196,38 +197,41 @@ export default function ProductsPage() {
   };
 
   const handleAddProduct = async () => {
-    const productToAdd = {
-      ...newProduct,
-      price: parseFloat(newProduct.price),
-      stock: parseInt(newProduct.stock),
-      status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
-      rating: 0,
-      sales: 0,
-      branch: "Jaffna" // ADD THIS LINE
-    };
-    try {
-      const response = await fetch('http://localhost:5000/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productToAdd)
-      });
-      if (!response.ok) throw new Error('Failed to add product');
-      const savedProduct = await response.json();
-      setProducts([...products, ...savedProduct.added]);
-      alert('Product added successfully!');
-    } catch (error) {
-      alert('Error adding product: ' + error.message);
-    }
-    setNewProduct({
-      name: '',
-      category: '',
-      price: '',
-      stock: '',
-      description: '',
-      image: ''
-    });
-    setIsAddModalOpen(false);
-  };
+
+const productToAdd = {
+  ...newProduct,
+  price: parseFloat(newProduct.price),
+  stock: parseInt(newProduct.stock),
+  rating: newProduct.rating ? parseFloat(newProduct.rating) : 0,
+  status: newProduct.status || (parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock'),
+  sales: 0,
+  branches: ["Jaffna", "Colombo"]
+};
+try {
+  const response = await fetch('http://localhost:5000/api/products', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productToAdd)
+  });
+  if (!response.ok) throw new Error('Failed to add product');
+  const savedProduct = await response.json();
+  setProducts([...products, ...savedProduct.added]);
+  alert('Product added successfully!');
+} catch (error) {
+  alert('Error adding product: ' + error.message);
+}
+setNewProduct({
+  name: '',
+  category: '',
+  price: '',
+  stock: '',
+  description: '',
+  image: ''
+});
+setIsAddModalOpen(false);
+};
+// ... existing code ...
+
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -316,7 +320,33 @@ export default function ProductsPage() {
                   </Select>
                 </div>
               </div>
-              
+
+                <div className="space-y-2">
+                  <Label htmlFor="rating">Rating</Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={newProduct.rating}
+                    onChange={e => setNewProduct({ ...newProduct, rating: e.target.value })}
+                    placeholder="e.g., 4.5"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={newProduct.status} onValueChange={value => setNewProduct({ ...newProduct, status: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="low-stock">Low Stock</SelectItem>
+                      <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">Price (LKR)</Label>
@@ -427,10 +457,11 @@ export default function ProductsPage() {
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
                 <Badge className={`absolute top-2 right-2 text-xs ${getStatusColor(product.status)}`}>
-                  {product.status.replace('-', ' ')}
+                {(product.status || '').replace('-', ' ')}
+
                 </Badge>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                  <p className="text-2xl font-bold text-white">LKR {product.price.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white">LKR {product.price ? Number(product.price).toFixed(2) : '0.00'}</p>
               </div>
               </div>
               <div className="p-4">
@@ -439,9 +470,9 @@ export default function ProductsPage() {
                 <div className="flex items-center justify-between text-sm mt-4">
                   <div className="flex items-center gap-1 text-amber-500">
                     <Star className="w-4 h-4" />
-                    <span className="font-medium">{product.rating.toFixed(1)}</span>
+                    <span className="font-medium">{product.rating ? Number(product.rating).toFixed(1) : '0.0'}</span>
                   </div>
-                  <div className="text-muted-foreground">{product.sales} sold</div>
+                  <div className="text-muted-foreground">{product.sales !== undefined ? product.sales : 0} sold</div>
                 </div>
                 <div className="flex gap-2 mt-4">
   <Button variant="outline" size="sm" className="flex items-center gap-1">
