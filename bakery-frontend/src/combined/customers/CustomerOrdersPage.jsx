@@ -1,8 +1,9 @@
 import { useCart } from "@/context/CartContext";
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useOrders } from '../../context/OrdersContext';
 import { useNotifications } from '../../context/NotificationContext';
 import html2pdf from 'html2pdf.js';
+import QRCode from 'qrcode';
 
 const mockOrders = [
   { id: 1, date: '2024-06-01', items: 3, total: 1400, status: 'Delivered' },
@@ -34,8 +35,20 @@ export default function CustomerOrdersPage({ customer, branch }) {
     'Other',
   ];
   const [refundMsg, setRefundMsg] = useState('');
+  const [qrUrl, setQrUrl] = useState('');
+  const [showBill, setShowBill] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState('');
+  const [mailStatus, setMailStatus] = useState('idle'); // idle | loading | success | error
+  const [mailMsg, setMailMsg] = useState('');
 
   const lastPaidTotal = lastPaidCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    QRCode.toDataURL(window.location.href, { width: 128 }, (err, url) => {
+      if (!err) setQrUrl(url);
+    });
+  }, []);
 
   return (
     <div>
@@ -47,57 +60,138 @@ export default function CustomerOrdersPage({ customer, branch }) {
         {/* Show payment success and bill even if cart is empty */}
         {paymentSuccess && (
           <>
-            <div className="bill-section p-6 bg-white rounded-xl border-2 border-green-400 shadow-lg max-w-lg mx-auto" id="bill-section">
-              {/* Bakery Branding */}
-              <div className="flex flex-col items-center mb-4">
-                <div className="text-2xl font-extrabold text-orange-700 tracking-wide mb-1">Sweet Dreams Bakery</div>
-                <div className="text-sm text-gray-700">123 Main Street, Colombo, Sri Lanka</div>
-                <div className="text-sm text-gray-700 mb-1">Phone: +94 77 123 4567</div>
-                <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-full mb-2"></div>
-              </div>
-              <div className="text-lg font-bold text-green-700 mb-2 text-center">Payment Successful!</div>
-              <div className="mb-2 text-center">Thank you for your order. Here is your bill:</div>
-              <table className="w-full text-sm text-gray-700 border border-green-200 rounded mb-3">
-                <thead>
-                  <tr className="bg-green-100">
-                    <th className="px-3 py-2 text-left">Product</th>
-                    <th className="px-3 py-2 text-right">Qty</th>
-                    <th className="px-3 py-2 text-right">Price</th>
-                    <th className="px-3 py-2 text-right">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lastPaidCart.map(item => (
-                    <tr key={item.id || item._id}>
-                      <td className="px-3 py-2">{item.name}</td>
-                      <td className="px-3 py-2 text-right">{item.quantity}</td>
-                      <td className="px-3 py-2 text-right">Rs.{item.price}</td>
-                      <td className="px-3 py-2 text-right">Rs.{item.price * item.quantity}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="flex justify-between items-center mt-2 mb-1">
-                <span className="font-semibold text-lg text-green-800">Total Paid:</span>
-                <span className="font-bold text-lg text-green-900">Rs.{lastPaidTotal}</span>
-              </div>
-              <div className="text-sm text-gray-700 mb-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
-            </div>
+            {showBill && (
+              <>
+                {showEmailForm && (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setMailStatus('loading');
+                      setMailMsg('');
+                      try {
+                        const billElement = document.getElementById('bill-section');
+                        if (!billElement) {
+                          setMailStatus('error');
+                          setMailMsg('Bill not found.');
+                          return;
+                        }
+                        // Generate PDF as Blob
+                        const pdfBlob = await html2pdf().set({
+                          margin: 0,
+                          filename: 'bill.pdf',
+                          image: { type: 'jpeg', quality: 0.98 },
+                          html2canvas: { scale: 2 },
+                          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+                          pagebreak: { mode: ['avoid-all'] }
+                        }).from(billElement).outputPdf('blob');
+                        // Send PDF blob to backend
+                        const formData = new FormData();
+                        formData.append('orderId', 'order123'); // or use real order id if available
+                        formData.append('email', email);
+                        formData.append('pdf', pdfBlob, 'bill.pdf');
+                        const res = await fetch('http://192.168.132.84:5000/api/bill/send', {
+                          method: 'POST',
+                          body: formData
+                        });
+                        if (res.ok) {
+                          setMailStatus('success');
+                          setMailMsg('Bill sent to your email!');
+                        } else {
+                          const data = await res.json();
+                          setMailStatus('error');
+                          setMailMsg(data.error || 'Failed to send bill.');
+                        }
+                      } catch (err) {
+                        setMailStatus('error');
+                        setMailMsg('Failed to send bill.');
+                      }
+                    }}
+                    className="flex flex-col gap-2 mb-4"
+                    style={{ maxWidth: 320, margin: '0 auto' }}
+                  >
+                    <label className="font-medium text-gray-700">Enter the mail:</label>
+                    <input
+                      type="email"
+                      className="border rounded px-3 py-2 text-base"
+                      placeholder="Enter your email address"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="bg-green-600 text-white rounded py-2 font-semibold hover:bg-green-700 transition-colors text-base"
+                      disabled={mailStatus === 'loading'}
+                    >
+                      {mailStatus === 'loading' ? 'Sending...' : 'Send Bill'}
+                    </button>
+                    {mailStatus === 'success' && <div className="mt-2 text-green-700 font-semibold text-center">{mailMsg}</div>}
+                    {mailStatus === 'error' && <div className="mt-2 text-red-600 font-semibold text-center">{mailMsg}</div>}
+                  </form>
+                )}
+                <div className="bill-section p-6 bg-white rounded-xl border-2 border-green-400 shadow-lg max-w-lg mx-auto" id="bill-section">
+                  {/* Bakery Branding */}
+                  <div className="flex flex-col items-center mb-4">
+                    <div className="text-2xl font-extrabold text-orange-700 tracking-wide mb-1">SE Bakers</div>
+                    <div className="text-sm text-gray-700">123 Main Street, Colombo, Sri Lanka</div>
+                    <div className="text-sm text-gray-700 mb-1">Phone: +94 77 123 4567</div>
+                    <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-full mb-2"></div>
+                  </div>
+                  <div className="text-lg font-bold text-green-700 mb-2 text-center">Payment Successful!</div>
+                  <div className="mb-2 text-center">Thank you for your order. Here is your bill:</div>
+                  <table className="w-full text-sm text-gray-700 border border-green-200 rounded mb-3">
+                    <thead>
+                      <tr className="bg-green-100">
+                        <th className="px-3 py-2 text-left">Product</th>
+                        <th className="px-3 py-2 text-right">Qty</th>
+                        <th className="px-3 py-2 text-right">Price</th>
+                        <th className="px-3 py-2 text-right">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lastPaidCart.map(item => (
+                        <tr key={item.id || item._id}>
+                          <td className="px-3 py-2">{item.name}</td>
+                          <td className="px-3 py-2 text-right">{item.quantity}</td>
+                          <td className="px-3 py-2 text-right">Rs.{item.price}</td>
+                          <td className="px-3 py-2 text-right">Rs.{item.price * item.quantity}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="flex justify-between items-center mt-2 mb-1">
+                    <span className="font-semibold text-lg text-green-800">Total Paid:</span>
+                    <span className="font-bold text-lg text-green-900">Rs.{lastPaidTotal}</span>
+                  </div>
+                  <div className="text-sm text-gray-700 mb-2">Paid with: {cardType === 'saved' ? 'Saved Card (**** 1234)' : 'New Card'}</div>
+                </div>
+              </>
+            )}
             {/* Download Bill button is OUTSIDE bill-section, so it will NOT appear in the PDF */}
-            <button
-              className="mt-3 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-medium w-auto no-pdf text-base"
-              onClick={() => {
-                const element = document.getElementById('bill-section');
-                if (element) {
-                  document.body.classList.add('pdf-mode');
-                  html2pdf().from(element).save().then(() => {
-                    document.body.classList.remove('pdf-mode');
-                  });
-                }
-              }}
-            >
-              Download Bill
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
+              <button
+                className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-medium w-auto no-pdf text-base"
+                onClick={() => {
+                  const element = document.getElementById('bill-section');
+                  if (element) {
+                    document.body.classList.add('pdf-mode');
+                    html2pdf().from(element).save().then(() => {
+                      document.body.classList.remove('pdf-mode');
+                    });
+                  }
+                }}
+              >
+                Download Bill
+              </button>
+              {qrUrl && <img src={qrUrl} alt="QR code" style={{ width: 48, height: 48 }} />}
+              <button
+                className="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium text-sm"
+                onClick={() => { setShowBill(true); setShowEmailForm(true); }}
+                disabled={showBill}
+              >
+                Scan
+              </button>
+            </div>
           </>
         )}
         {/* Show cart as a pending order if cart is not empty and payment not done */}

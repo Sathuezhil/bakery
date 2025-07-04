@@ -104,7 +104,7 @@ export default function BillEmailPage() {
           }}>
             {/* Only bill content below will be in the PDF. Do NOT put download/email buttons inside this div. */}
             <div style={{ textAlign: 'center', marginBottom: 18 }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#c2410c', letterSpacing: 1, marginBottom: 4 }}>Sweet Dreams Bakery</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#c2410c', letterSpacing: 1, marginBottom: 4 }}>SE Bakery</div>
               <div style={{ fontSize: 15, color: '#444' }}>123 Main Street, Colombo, Sri Lanka</div>
               <div style={{ fontSize: 15, color: '#444', marginBottom: 4 }}>Phone: +94 77 123 4567</div>
               <div style={{ width: 60, height: 4, background: 'linear-gradient(90deg,#fb923c,#fbbf24)', borderRadius: 4, margin: '0 auto 10px auto' }}></div>
