@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -174,7 +174,11 @@ export default function ProductsPage() {
     description: '',
     image: ''
   });
-
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+  }, []);
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -191,18 +195,29 @@ export default function ProductsPage() {
     }
   };
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     const productToAdd = {
-      id: Date.now(),
       ...newProduct,
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
       status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
       rating: 0,
-      sales: 0
+      sales: 0,
+      branch: "Jaffna" // ADD THIS LINE
     };
-    
-    setProducts([...products, productToAdd]);
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productToAdd)
+      });
+      if (!response.ok) throw new Error('Failed to add product');
+      const savedProduct = await response.json();
+      setProducts([...products, ...savedProduct.added]);
+      alert('Product added successfully!');
+    } catch (error) {
+      alert('Error adding product: ' + error.message);
+    }
     setNewProduct({
       name: '',
       category: '',

@@ -267,7 +267,11 @@ export default function CombinedProducts() {
     description: '',
     image: ''
   });
-  
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+  }, []);
   const [editingProduct, setEditingProduct] = useState(null);
 // Load products from localStorage on mount
 useEffect(() => {
@@ -303,24 +307,38 @@ useEffect(() => {
     return acc;
   }, {});
 
-  const handleAddProduct = () => {
-    if (newProduct.name && newProduct.price && newProduct.category && newProduct.branch) {
-      const stock = parseInt(newProduct.stock) || 0;
-      const status = stock > 10 ? 'active' : stock > 0 ? 'low-stock' : 'out-of-stock';
-      const product = {
-        id: Date.now(),
-        ...newProduct,
-        price: parseFloat(newProduct.price),
-        stock,
-        status,
-        rating: 0,
-        sales: 0,
-        image: newProduct.image || getProductEmoji(newProduct.category)
-      };
-      setProducts([...products, product]);
-      setNewProduct({ name: '', price: '', category: '', branch: '', stock: '', description: '', image: '' });
-      setIsAddDialogOpen(false);
+  const handleAddProduct = async () => {
+    const productToAdd = {
+      ...newProduct,
+      price: parseFloat(newProduct.price),
+      stock: parseInt(newProduct.stock),
+      status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
+      rating: 0,
+      sales: 0,
+      branch: "Jaffna" // ADD THIS LINE
+    };
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productToAdd)
+      });
+      if (!response.ok) throw new Error('Failed to add product');
+      const savedProduct = await response.json();
+      setProducts([...products, ...savedProduct.added]);
+      alert('Product added successfully!');
+    } catch (error) {
+      alert('Error adding product: ' + error.message);
     }
+    setNewProduct({
+      name: '',
+      category: '',
+      price: '',
+      stock: '',
+      description: '',
+      image: ''
+    });
+    setIsAddModalOpen(false);
   };
 
   const handleEditProduct = (product) => {
