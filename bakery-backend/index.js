@@ -26,8 +26,8 @@ app.use('/api/auth', authRoutes);
 const promotionRoutes = require('./routes/promotions');
 app.use('/api/promotions', promotionRoutes);
 
-const billRoutes = require('./routes/bill');
-app.use('/api/bill', billRoutes);
+const billRouter = require('./routes/bill');
+app.use('/api/bill', billRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

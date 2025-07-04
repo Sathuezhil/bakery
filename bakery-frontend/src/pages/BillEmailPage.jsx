@@ -8,9 +8,9 @@ export default function BillEmailPage() {
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const [order, setOrder] = useState(null);
-
+  console.log('orderId:', orderId);
   useEffect(() => {
-    fetch(`http://192.168.132.84:5000/api/bill/order/${orderId}`)
+    fetch(`/api/bill/order/${orderId}`)
       .then(res => res.json())
       .then(data => setOrder(data.order))
       .catch(() => setOrder(null));
@@ -68,6 +68,7 @@ export default function BillEmailPage() {
       formData.append('orderId', orderId);
       formData.append('email', email);
       formData.append('pdf', pdfBlob, 'bill.pdf');
+      // Use relative path; Vite proxy will forward to backend
       const res = await fetch('/api/bill/send', {
         method: 'POST',
         body: formData
