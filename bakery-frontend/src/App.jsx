@@ -199,32 +199,34 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/bill-email/:orderId" element={<BillEmailPage />} />
-      <Route path="*" element={
-        <div className="min-h-screen bakery-gradient flex h-screen">
-          <Sidebar
-            activeTab={activeBranchPage}
-            setActiveTab={setActiveBranchPage}
-            sidebarOpen={sidebarOpen}
-            setSidebarOpen={setSidebarOpen}
-            activeBranch={activeBranch}
-            setActiveBranch={handleSetActiveBranch}
-            onLogout={handleLogout}
-            userRole={user?.role}
-            user={user}
-          />
-          <div className="flex-1 flex flex-col">
-            <Header setSidebarOpen={setSidebarOpen} user={user} onLogout={handleLogout} activeBranch={activeBranch} />
-            <main className="flex-1 p-6 overflow-auto">
-              <div className="max-w-7xl mx-auto">
-                {content}
-              </div>
-            </main>
+    <NotificationProvider branch={activeBranch}>
+      <Routes>
+        <Route path="/bill-email/:orderId" element={<BillEmailPage />} />
+        <Route path="*" element={
+          <div className="min-h-screen bakery-gradient flex h-screen">
+            <Sidebar
+              activeTab={activeBranchPage}
+              setActiveTab={setActiveBranchPage}
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              activeBranch={activeBranch}
+              setActiveBranch={handleSetActiveBranch}
+              onLogout={handleLogout}
+              userRole={user?.role}
+              user={user}
+            />
+            <div className="flex-1 flex flex-col">
+              <Header setSidebarOpen={setSidebarOpen} user={user} onLogout={handleLogout} activeBranch={activeBranch} />
+              <main className="flex-1 p-6 overflow-auto">
+                <div className="max-w-7xl mx-auto">
+                  {content}
+                </div>
+              </main>
+            </div>
           </div>
-        </div>
-      } />
-    </Routes>
+        } />
+      </Routes>
+    </NotificationProvider>
   );
 }
 
@@ -232,10 +234,9 @@ export default function WrappedApp() {
   return (
     <OrdersProvider>
       <CartProvider>
-        <NotificationProvider>
-          <App />
-        </NotificationProvider>
+        <App />
       </CartProvider>
     </OrdersProvider>
   );
 }
+

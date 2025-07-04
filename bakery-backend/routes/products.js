@@ -16,40 +16,46 @@ router.post('/', async (req, res) => {
     const addedBranches = Array.isArray(branches) ? branches : [branches];
     const fromBranch = addedBranches[0]; // The branch that initiated the add
     let product = await Product.findOne({ name, category });
+    // List of all possible branches
+    const allBranches = ['combined', 'colombo', 'jaffna'];
     if (product) {
       // Add new branches if not present
       let newBranches = addedBranches.filter(b => !product.branches.includes(b));
       if (newBranches.length > 0) {
         product.branches.push(...newBranches);
         await product.save();
-        // Create notifications for new branches (except the one that added)
-        for (let branch of newBranches) {
-          if (branch !== fromBranch) {
-            await Notification.create({
-              productId: product._id,
-              productName: product.name,
-              fromBranch,
-              toBranch: branch,
-              type: 'product_added',
-              createdAt: new Date()
-            });
-          }
+      }
+      // Notify all other branches except the one that added
+      for (let branch of allBranches) {
+        if (branch !== fromBranch) {
+          await Notification.create({
+            productId: product._id,
+            productName: product.name,
+            fromBranch,
+            branch: branch,
+            type: 'product_added',
+            message: 'New product added',
+            createdAt: new Date()
+          });
         }
       }
       res.status(201).json({ product, added: [product] });
     } else {
       // Create new product with all branches
       product = await Product.create({ name, category, ...productData, branches: addedBranches });
-      // Create notifications for all branches except the one that added
-      for (let i = 1; i < addedBranches.length; i++) {
-        await Notification.create({
-          productId: product._id,
-          productName: product.name,
-          fromBranch,
-          toBranch: addedBranches[i],
-          type: 'product_added',
-          createdAt: new Date()
-        });
+      // Notify all other branches except the one that added
+      for (let branch of allBranches) {
+        if (branch !== fromBranch) {
+          await Notification.create({
+            productId: product._id,
+            productName: product.name,
+            fromBranch,
+            branch: branch,
+            type: 'product_added',
+            message: 'New product added',
+            createdAt: new Date()
+          });
+        }
       }
       res.status(201).json({ product, added: [product] });
     }
