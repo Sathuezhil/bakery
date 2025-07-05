@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 export default function ProductNotificationPopup({ notification, onClose }) {
   if (!notification) return null;
@@ -7,9 +8,9 @@ export default function ProductNotificationPopup({ notification, onClose }) {
     return branch.charAt(0).toUpperCase() + branch.slice(1);
   };
   
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 flex justify-center items-start bg-black bg-opacity-80 z-[999999]">
+      <div className="mt-40 bg-white rounded-lg shadow-2xl border-2 border-orange-200 p-6 w-96" style={{ zIndex: 1000000 }}>
         <h2 className="text-xl font-bold mb-4 text-orange-700">New Product Added</h2>
         <div className="space-y-3">
           <div>
@@ -42,6 +43,7 @@ export default function ProductNotificationPopup({ notification, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 } 

@@ -60,7 +60,7 @@ export default function ProductsPage() {
       status: parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock',
       rating: newProduct.rating ? parseFloat(newProduct.rating) : 0, // <-- Use the value from the form
       sales: 0,
-      branches: ["jaffna", "colombo"] 
+      branches: ["colombo", "jaffna"] // Colombo is the current branch
     };
   try {
     const response = await fetch('http://localhost:5000/api/products', {

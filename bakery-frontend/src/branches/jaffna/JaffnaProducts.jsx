@@ -197,16 +197,15 @@ export default function ProductsPage() {
   };
 
   const handleAddProduct = async () => {
-
-const productToAdd = {
-  ...newProduct,
-  price: parseFloat(newProduct.price),
-  stock: parseInt(newProduct.stock),
-  rating: newProduct.rating ? parseFloat(newProduct.rating) : 0,
-  status: newProduct.status || (parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock'),
-  sales: 0,
-  branches: ["jaffna", "colombo"]
-};
+    const productToAdd = {
+      ...newProduct,
+      price: parseFloat(newProduct.price),
+      stock: parseInt(newProduct.stock),
+      rating: newProduct.rating ? parseFloat(newProduct.rating) : 0,
+      status: newProduct.status || (parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock'),
+      sales: 0,
+      branches: ["jaffna", "colombo"] // Jaffna is the current branch
+    };
 try {
   const response = await fetch('http://localhost:5000/api/products', {
     method: 'POST',
