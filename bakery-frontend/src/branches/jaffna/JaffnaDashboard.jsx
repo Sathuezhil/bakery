@@ -13,7 +13,6 @@ import {
   Package
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import NotificationBell from '../../components/layout/NotificationBell';
 
 const productData = [
   { name: 'Bread', value: 25, color: '#eab308' },
@@ -91,7 +90,6 @@ export default function JaffnaDashboard() {
 
   return (
     <div>
-      <NotificationBell branch="jaffna" />
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 rounded-2xl p-6 text-white shadow-xl">

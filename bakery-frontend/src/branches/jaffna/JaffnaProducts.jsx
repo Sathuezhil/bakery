@@ -205,7 +205,7 @@ const productToAdd = {
   rating: newProduct.rating ? parseFloat(newProduct.rating) : 0,
   status: newProduct.status || (parseInt(newProduct.stock) > 10 ? 'active' : parseInt(newProduct.stock) > 0 ? 'low-stock' : 'out-of-stock'),
   sales: 0,
-  branches: ["Jaffna", "Colombo"]
+  branches: ["jaffna", "colombo"]
 };
 try {
   const response = await fetch('http://localhost:5000/api/products', {

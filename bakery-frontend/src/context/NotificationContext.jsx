@@ -11,15 +11,17 @@ export function NotificationProvider({ children, branch }) {
     fetch(`http://localhost:5000/api/products/notifications?branch=${branch}`)
       .then(res => res.json())
       .then(data => {
-        console.log('Fetched notifications for branch', branch, data); // <-- Add this line
-        setNotifications(data.reverse());
+        // Only keep unread notifications
+        const unread = data.filter(n => !n.read);
+        setNotifications(unread.reverse());
       });
   }, [branch]);
 
   const addNotification = (notification) => {
     setNotifications(prev => {
-      const newNotif = { ...notification, id: notification.id || (Date.now() + Math.random()), read: false };
-      const updated = [newNotif, ...prev.filter(n => n.id !== newNotif.id)];
+      // Always use _id from backend
+      const newNotif = { ...notification, read: false };
+      const updated = [newNotif, ...prev.filter(n => n._id !== newNotif._id)];
       console.log('addNotification:', newNotif);
       console.log('notifications after add:', updated);
       return updated;
@@ -32,7 +34,7 @@ export function NotificationProvider({ children, branch }) {
 
   const removeNotification = (id) => {
     setNotifications(prev => {
-      const updated = prev.filter(n => n.id !== id);
+      const updated = prev.filter(n => n._id !== id);
       console.log('removeNotification:', id);
       console.log('notifications after remove:', updated);
       return updated;

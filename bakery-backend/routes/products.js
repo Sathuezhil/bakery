@@ -14,7 +14,8 @@ router.post('/', async (req, res) => {
   try {
     const { name, category, branches = [], ...productData } = req.body;
     const addedBranches = Array.isArray(branches) ? branches : [branches];
-    const fromBranch = addedBranches[0]; // The branch that initiated the add
+    // Convert branch names to lowercase for consistency
+    const fromBranch = addedBranches[0].toLowerCase(); // The branch that initiated the add
     let product = await Product.findOne({ name, category });
     // List of all possible branches
     const allBranches = ['combined', 'colombo', 'jaffna'];
@@ -34,7 +35,7 @@ router.post('/', async (req, res) => {
             fromBranch,
             branch: branch,
             type: 'product_added',
-            message: 'New product added',
+            message: `New product "${product.name}" added from ${fromBranch.charAt(0).toUpperCase() + fromBranch.slice(1)} branch`,
             createdAt: new Date()
           });
         }
@@ -52,7 +53,7 @@ router.post('/', async (req, res) => {
             fromBranch,
             branch: branch,
             type: 'product_added',
-            message: 'New product added',
+            message: `New product "${product.name}" added from ${fromBranch.charAt(0).toUpperCase() + fromBranch.slice(1)} branch`,
             createdAt: new Date()
           });
         }

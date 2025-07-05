@@ -17,7 +17,6 @@ import {
   Activity
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import NotificationBell from '../components/layout/NotificationBell';
 
 // Combined data from both branches
 const combinedSalesData = [
@@ -98,7 +97,6 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <NotificationBell branch="combined" />
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
