@@ -9,7 +9,8 @@ const sampleNotifications = [
 ];
 
 export default function CustomerHeader({ customer }) {
-  console.log('Customer bell for:', customer?.email);
+  console.log('Customer bell for:', customer?.username || customer?.id);
+  console.log('Customer object:', customer);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications] = useState(sampleNotifications);
   const unreadCount = notifications.length;
@@ -18,7 +19,7 @@ export default function CustomerHeader({ customer }) {
     <header className="bg-white/90 backdrop-blur-md border-b border-orange-200/50 shadow-sm sticky top-0 z-30">
       <div className="flex items-center justify-between px-6 py-3">
         <div className="text-xl font-bold text-orange-700">Bakery</div>
-        <NotificationBell branch={null} customer={customer?.email || customer?.id} />
+        <NotificationBell branch={null} customer={customer?.username || customer?.id} />
       </div>
     </header>
   );

@@ -4,18 +4,42 @@ import { useNotifications } from '../../context/NotificationContext';
 import ProductNotificationPopup from './ProductNotificationPopup';
 
 export default function NotificationBell({ branch = 'all', customer }) {
-  const { notifications, addNotification, markAllAsRead, removeNotification } = useNotifications();
+  const notificationContext = useNotifications();
+  
+  // Handle case where context is not available
+  if (!notificationContext) {
+    console.warn('NotificationBell: NotificationContext not available');
+    return (
+      <div className="relative">
+        <button className="relative focus:outline-none">
+          <Bell className="w-7 h-7 text-orange-500" />
+        </button>
+      </div>
+    );
+  }
+  
+  console.log('NotificationBell: notificationContext:', notificationContext);
+  
+  const { notifications, addNotification, markAllAsRead, removeNotification } = notificationContext;
   const [open, setOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  
+  // Ensure notifications is an array and all required functions exist
+  const safeNotifications = notifications || [];
+  const safeAddNotification = addNotification || (() => {});
+  const safeMarkAllAsRead = markAllAsRead || (() => {});
+  const safeRemoveNotification = removeNotification || (() => {});
+  
   // Debug logs
-  console.log('NotificationBell: customer:', customer, 'branch:', branch, 'notifications:', notifications);
+  console.log('NotificationBell: customer:', customer, 'branch:', branch, 'notifications:', safeNotifications);
+  
   // Filter notifications by customer or branch
-  let filteredNotifications = notifications;
+  let filteredNotifications = safeNotifications;
   if (customer) {
-    filteredNotifications = notifications.filter(n => n.customer === customer && (n.title === 'Order Confirmed' || n.message));
+    filteredNotifications = safeNotifications.filter(n => n.customer === customer && (n.title === 'Order Confirmed' || n.message));
   } else if (branch) {
     // Only show notifications where fromBranch is NOT the current branch
-    filteredNotifications = notifications.filter(n => n.fromBranch !== branch && (n.message || n.title === 'Low Stock' || n.title === 'New Order'));
+    filteredNotifications = safeNotifications.filter(n => n.fromBranch !== branch && (n.message || n.title === 'Low Stock' || n.title === 'New Order'));
   }
   
   // Remove duplicates based on unique combination of productId, fromBranch, and branch
@@ -41,7 +65,7 @@ export default function NotificationBell({ branch = 'all', customer }) {
         className="relative focus:outline-none"
         onClick={() => {
           setOpen(!open);
-          if (!open) markAllAsRead();
+          if (!open) safeMarkAllAsRead();
         }}
       >
         <Bell className="w-7 h-7 text-orange-500" />
@@ -117,7 +141,7 @@ export default function NotificationBell({ branch = 'all', customer }) {
             // Mark as read in backend
             const id = selectedNotification._id;
             await fetch(`http://localhost:5000/api/products/notifications/${id}/read`, { method: 'PATCH' });
-            removeNotification(id);
+            safeRemoveNotification(id);
             setSelectedNotification(null);
           }} 
         />

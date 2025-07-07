@@ -7,13 +7,30 @@ export function NotificationProvider({ children, branch }) {
 
   // Fetch notifications from backend for the current branch
   useEffect(() => {
-    if (!branch) return;
+    if (!branch) {
+      // For customer notifications, initialize with empty array
+      // TODO: Implement customer-specific notification fetching
+      setNotifications([]);
+      return;
+    }
+    
+    console.log('Fetching notifications for branch:', branch);
     fetch(`http://localhost:5000/api/products/notifications?branch=${branch}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        console.log('Fetched notifications:', data);
         // Only keep unread notifications
         const unread = data.filter(n => !n.read);
         setNotifications(unread.reverse());
+      })
+      .catch(error => {
+        console.error('Error fetching notifications:', error);
+        setNotifications([]);
       });
   }, [branch]);
 

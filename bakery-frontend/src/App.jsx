@@ -97,47 +97,51 @@ function App() {
   // If customer is logged in, show only their dashboard and sidebar
   if (customerUser) {
     return (
-      <div className="min-h-screen bakery-gradient flex h-screen">
-        <CustomerSidebar
-          activeTab={customerTab}
-          setActiveTab={setCustomerTab}
-          onSignOut={handleCustomerSignOut}
-          activeCustomerBranch={activeCustomerBranch}
-          setActiveCustomerBranch={setActiveCustomerBranch}
-        />
-        <div className="flex-1 flex flex-col">
-          <CustomerHeader customer={customerUser} />
-          <main className="flex-1 overflow-y-auto p-6">
-            <CombinedCustomerDashboard
-              customer={customerUser}
-              activeTab={customerTab}
-              setActiveTab={setCustomerTab}
-              activeCustomerBranch={activeCustomerBranch}
-              onSignOut={handleCustomerSignOut}
-            />
-          </main>
+      <NotificationProvider branch={activeCustomerBranch}>
+        <div className="min-h-screen bakery-gradient flex h-screen">
+          <CustomerSidebar
+            activeTab={customerTab}
+            setActiveTab={setCustomerTab}
+            onSignOut={handleCustomerSignOut}
+            activeCustomerBranch={activeCustomerBranch}
+            setActiveCustomerBranch={setActiveCustomerBranch}
+          />
+          <div className="flex-1 flex flex-col">
+            <CustomerHeader customer={customerUser} />
+            <main className="flex-1 overflow-y-auto p-6">
+              <CombinedCustomerDashboard
+                customer={customerUser}
+                activeTab={customerTab}
+                setActiveTab={setCustomerTab}
+                activeCustomerBranch={activeCustomerBranch}
+                onSignOut={handleCustomerSignOut}
+              />
+            </main>
+          </div>
         </div>
-      </div>
+      </NotificationProvider>
     );
   }
 
   // If super admin selects 'customer' branch, show customer sidebar and dashboard
   if (user && user.role === 'super-admin' && activeBranch === 'customer') {
     return (
-      <div className="min-h-screen bakery-gradient flex h-screen">
-        <CustomerSidebar
-          activeTab={customerTab}
-          setActiveTab={setCustomerTab}
-          onSignOut={handleCustomerSignOut}
-          activeBranch={activeBranch}
-          setActiveBranch={handleSetActiveBranch}
-        />
-        <div className="flex-1 flex flex-col">
-          <main className="flex-1 overflow-y-auto p-6">
-            <CombinedCustomerDashboard customer={{ id: 1, name: 'Arun Kumar' }} activeTab={customerTab} setActiveTab={setCustomerTab} />
-          </main>
+      <NotificationProvider branch={activeBranch}>
+        <div className="min-h-screen bakery-gradient flex h-screen">
+          <CustomerSidebar
+            activeTab={customerTab}
+            setActiveTab={setCustomerTab}
+            onSignOut={handleCustomerSignOut}
+            activeBranch={activeBranch}
+            setActiveBranch={handleSetActiveBranch}
+          />
+          <div className="flex-1 flex flex-col">
+            <main className="flex-1 overflow-y-auto p-6">
+              <CombinedCustomerDashboard customer={{ id: 1, name: 'Arun Kumar' }} activeTab={customerTab} setActiveTab={setCustomerTab} />
+            </main>
+          </div>
         </div>
-      </div>
+      </NotificationProvider>
     );
   }
 
